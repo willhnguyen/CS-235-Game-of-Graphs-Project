@@ -1,0 +1,28 @@
+{
+  "name": "cs-235-game-of-graphs-project",
+  "version": "1.0.0",
+  "description": "Data visualization of country GDP and CO2 emission",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/willhnguyen/CS-235-Game-of-Graphs-Project.git"
+  },
+  "author": "Game of Graphs",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/willhnguyen/CS-235-Game-of-Graphs-Project/issues"
+  },
+  "homepage": "https://github.com/willhnguyen/CS-235-Game-of-Graphs-Project#readme",
+  "devDependencies": {
+    "async": "^2.6.0",
+    "csv-parse": "^2.0.4"
+  },
+  "dependencies": {
+    "csv-load-sync": "^1.0.0",
+    "csvtojson": "^1.1.9",
+    "fs-sync": "^1.0.4"
+  }
+}
