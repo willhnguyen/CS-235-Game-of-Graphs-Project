@@ -1,0 +1,64 @@
+<canvas id="bubbleChart" width="100" height="50"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+
+
+<script>
+var canvas = document.getElementById("bubbleChart");
+
+Chart.defaults.global.defaultFontFamily = "Lato";
+Chart.defaults.global.defaultFontSize = 18;
+
+
+var json = {"data":[
+{"Country Name":"Aruba","Country Code":"ABW","GDP Data":{ "2000":40}, "CO2 Data":{"2000":60}},
+{"Country Name":"Afghanistan","Country Code":"AFG","GDP Data":{ "2000":20}, "CO2 Data":{"2000":20}},
+{"Country Name":"Angola","Country Code":"AGO","GDP Data":{ "2000":80}, "CO2 Data":{"2000":100}},
+{"Country Name":"Albania","Country Code":"ALB","GDP Data":{ "2000":30}, "CO2 Data":{"2000":30}},
+{"Country Name":"Andorra","Country Code":"AND","GDP Data":{ "2000":40}, "CO2 Data":{"2000":40}},
+{"Country Name":"United Arab Emirates","Country Code":"ARE","GDP Data":{ "2000":60}, "CO2 Data":{"2000":60}}
+
+]}
+
+var dynamicColors = function() {
+    var r = Math.floor(Math.random() * 255);
+    var g = Math.floor(Math.random() * 255);
+    var b = Math.floor(Math.random() * 255);
+    return "rgb(" + r + "," + g + "," + b + ")";
+}
+
+
+ var jsonData = json["data"]
+
+var chartData = {datasets:[]};
+for (var i = 0; i < jsonData.length; i++)
+{
+    var key = jsonData[i];
+    chartData.datasets.push({label:key["Country Name"], backgroundColor: dynamicColors(), data:[{x: key["GDP Data"]["2000"], y: key["CO2 Data"]["2000"],r: 10}]});   
+}
+
+var bubbleChart = new Chart(canvas, {
+  type: 'bubble',
+  data: chartData,
+  options:
+             {
+                 title: { text: 'Climate Change Data Visualization ', display: 'true' },
+                 tooltips: { 
+                  mode: 'point',
+                  callbacks: {
+                    label: function(t, d) {
+                      return d.datasets[t.datasetIndex].label + 
+                        ': (GDP:' + t.xLabel + ', CO2:' + t.yLabel + ')';
+                     }
+                  } 
+                },
+                legend: { display: 'true' },
+                scaleBeginAtZero: 'false',
+                responsive: 'true',
+                scales: {
+                     xAxes: [{ position: 'bottom', gridLines: { zeroLineColor: 'rgba(0,0,0,1)' }, scaleLabel: { display: 'true', labelString: 'GDP' } }],
+                     yAxes: [{ position: 'left', gridLines: { zeroLineColor: 'rgba(0,0,0,1)' }, scaleLabel: { display: 'true', labelString: 'CO2 Emissions' } }]
+                 }
+             }
+     });
+
+</script>
