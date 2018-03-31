@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./styles/default.css">
+    <title>Game of Graphs</title>
+</head>
+<body>
+    <main>
+        <h1>Comparing GDP and Climate Change</h1>
+        <p id="subtitle">By the Game of Graphs Team</p>
+
+        <p>Does GDP affect a nation's contribution to climate change? Let's find out through a visualization! Play around with the visualization below. If you're stuck, read on to understand some of the interesting things we found.</p>
+
+        <!-- Dropdown for Year (Example) -->
+        <label>Year Picker:</label> <select name="Year Picker" id="year-picker" onchange="yearPickerUpdated(this)">
+        </select>
+
+        <!-- ChartJS Visualization -->
+        <div id="chart-container">
+            <div id="gdp-chart-container">
+                <canvas id="gdp-chart"></canvas>
+            </div>
+            <section id="chart-info">
+                <h1>{{ Chart-Info Title }}</h1>
+
+                <p>{{ Chart-Info }}</p>
+            </section>
+        </div>
+
+        <!-- Slider for Year -->
+        <label>Year Slider:</label> <input type="range" id="year-slider" 
+        onmousemove="yearSliderUpdated(this)">
+
+        <h2>Analysis</h2>
+        <p>{{ Information to be added here }}</p>
+
+        <h2>Credits</h2>
+        <ul>
+            <li><a href="chartjs.org">Chart.js</a></li>
+        </ul>
+    </main>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+<script src="./scripts/main.js"></script>
+</html>
