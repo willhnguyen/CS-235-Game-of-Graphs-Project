@@ -23,6 +23,7 @@
   "dependencies": {
     "csv-load-sync": "^1.0.0",
     "csvtojson": "^1.1.9",
-    "fs-sync": "^1.0.4"
+    "fs-sync": "^1.0.4",
+    "jsdoc": "^3.5.5"
   }
 }
