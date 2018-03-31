@@ -76,7 +76,6 @@ class GDPChart {
      */
     generateChart() {
         // Set up the dataset to be passed to chartjs
-        // 
         let chartData = this.data.data.map((val, idx, arr)=>{
             return {
                 label: val["Country Name"],
@@ -96,6 +95,8 @@ class GDPChart {
                 text: 'Climate Change Data Visualization',
                 display: 'true'
             },
+            onHover: this.onHoverEvent(),
+            onClick: this.onClickEvent(),
             tooltips: {
                 mode: 'point',
                 callbacks: {
@@ -202,7 +203,58 @@ class GDPChart {
         // Show the information of identified country
         // showCountryInfo(0);
 
-        return d.datasets[t.datasetIndex].label + ': (GDP: ' + t.xLabel + ', CO2: ' + t.yLabel + ')';
+        return d.datasets[t.datasetIndex].label + ': (GDP: ' + t.xLabel.toFixed(5) + ', CO2: ' + t.yLabel.toFixed(5) + ')';
+    }
+
+    /**
+     * Callback for when the chart registers a hover event.
+     */
+    onHoverEvent() {
+        let that = this;
+
+        /**
+         * Closure to provide context to GDPChart object as variable 'that'
+         * @param {Object} _ Mouse click information
+         * @param {Object} chartEl A list of objects clicked with respect to Chartjs
+         */
+        return (_, chartEl)=>{
+            if (chartEl.length > 0) {
+                // An element has been clicked.
+                let elementID = chartEl[0]._datasetIndex;
+                
+                // // Example of using it to extract dataset information
+                // console.log("HOVER!", chartEl);
+                // console.log(that.chartjsObj.data.datasets[elementID]);
+            } else {
+                // Chart background hovered
+            }
+        }
+    }
+
+    /**
+     * Callback for when the chart registers a click event.
+     */
+    onClickEvent() {
+        let that = this;
+
+        /**
+         * Closure to provide context to GDPChart object as variable 'that'
+         * @param {Object} _ Mouse click information
+         * @param {Object} chartEl A list of objects clicked with respect to Chartjs
+         */
+        return (_, chartEl)=>{
+
+            if (chartEl.length > 0) {
+                // An element has been clicked.
+                let elementID = chartEl[0]._datasetIndex;
+                
+                // // Example of using it to extract dataset information
+                // console.log("CLICK!", chartEl);
+                // console.log(that.chartjsObj.data.datasets[elementID]);
+            } else {
+                // Selected chart background
+            }
+        };
     }
 
     /**
