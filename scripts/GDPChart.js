@@ -12,8 +12,8 @@
 /**
  * Set the desired data location and the id of the chart element to update.
  */
-// let dataFilePath = '../data/json/gdp_co2_combined_data.json';
-let /** !String */ dataFilePath = 'https://raw.githubusercontent.com/willhnguyen/CS-235-Game-of-Graphs-Project/master/data/json/gdp_co2_combined_data.json';
+// let dataFilePath = '../data/json/combined_data.json';
+let /** !String */ dataFilePath = 'https://raw.githubusercontent.com/willhnguyen/CS-235-Game-of-Graphs-Project/master/data/json/combined_data.json';
 let chartElementID = 'gdp-chart';
 
 /**
