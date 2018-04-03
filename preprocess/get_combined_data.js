@@ -57,7 +57,7 @@ for (let id in countriesList.data) {
 
     // Add row to combinedData object
     combinedData.data.push(rowObject);
-    combinedData.ids[id] = combinedData.length - 1;
+    combinedData.ids[id] = combinedData.data.length - 1;
 }
 
 fs.write('../data/json/combined_data.json', JSON.stringify(combinedData));
