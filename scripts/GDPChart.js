@@ -110,10 +110,10 @@ class GDPChart {
     generateChart() {
         // Set up the dataset to be passed to chartjs
         let chartData = this.data.data.map((val, idx, arr)=>{
-            console.log(this.getCountryPopulation(val["Country Code"], this.yearToDisplay));
+//            console.log(this.getCountryPopulation(val["Country Code"], this.yearToDisplay));
             return {
                 label: val["Country Name"],
-                backgroundColor: "rgb(255, 0, 0)",
+                backgroundColor: this.getCountryColor(val["Country Code"], this.yearToDisplay),
                 data: [
                     {
                         x: val["GDP Data"][this.yearToDisplay],
@@ -158,6 +158,12 @@ class GDPChart {
                             display: 'true',
                             labelString: 'GDP'
                         },
+                        ticks: {
+                            autoSkip: false,
+                            beginAtZero: true,
+                            min: 0,
+                            max: 2e5
+                        },
                         type: 'logarithmic'
                     }
                 ],
@@ -170,6 +176,12 @@ class GDPChart {
                         scaleLabel: {
                             display: 'true',
                             labelString: 'CO2 Emissions'
+                        },
+                        ticks: {
+                            autoSkip: false,
+                            beginAtZero: true,
+                            min: 0,
+                            max: 2e7
                         },
                         type: 'logarithmic'
                     }
@@ -215,9 +227,11 @@ class GDPChart {
             val.data[0].x = this.data.data[idx]["GDP Data"][year];
             val.data[0].y = this.data.data[idx]["CO2 Data"][year];
             val.data[0].r = Math.log(this.getCountryPopulation(this.data.data[idx]["Country Code"], year))/2;
+            val.backgroundColor = this.getCountryColor(this.data.data[idx]["Country Code"], year);
             //console.log(this.data.data[idx]["Country Code"]);
             //val.data[0].r = 10;
         })
+        this.yearToDisplay = year;
 
         this.updateChart();
     }
@@ -340,9 +354,77 @@ class GDPChart {
      * 
      * @param {string} countryID The 3-letter id of a country
      * @param {number} year An integer value denoting the desired year to visualize
+     * @author William Nguyen
      */
     getCountryColor(countryID, year) {
-        return 'rgb(255,0,0)';
+        let gradientColors = this.colorGradient;
+        let gradient = [];
+        
+        // Default color is a gray color (will stay this color if data is undefined for datapoint)
+        let r = 85;
+        let g = 85;
+        let b = 85;
+        let a = 0.5;
+        
+        // Get a country value
+        let colorDataKey = 'GDP Data';
+        let countryIndex = this.data.ids[countryID];
+        let value = false;
+        if (this.data.data[countryIndex][colorDataKey] !== undefined) {
+            value = this.data.data[countryIndex][colorDataKey][year];
+        }
+        
+        // Interpolate color value based on the data value
+        let data_min = Math.log(3e2);
+        let data_max = Math.log(2e5);
+        if (value !== false && value !== undefined) {
+            value = Math.log(value);
+            let value_percentage = (value - data_min) / (data_max - data_min);
+            
+            // Get the colors to interpolate between
+            for (let i = 2; i < gradientColors.length; ++i) {
+                if (value_percentage > gradientColors[i-1][0] && value_percentage < gradientColors[i][0]) {
+                    gradient = [gradientColors[i-1], gradientColors[i]];
+                    break;
+                }
+            }
+            
+            // Normalize value_percentage based on gradient color range
+            value_percentage = (value_percentage - gradient[0][0]) / (gradient[1][0] - gradient[0][0]);
+            
+            // Calculate color with simple interpolation
+            if (gradientColors[0] === "hsl") {
+                r = value_percentage * gradient[1][1] + (1 - value_percentage) * gradient[0][1];
+                g = value_percentage * gradient[1][2] + (1 - value_percentage) * gradient[0][2];
+                b = value_percentage * gradient[1][3] + (1 - value_percentage) * gradient[0][3];
+            }
+            
+            // Calculate color with light intensity considered
+            if (gradientColors[0] === "rgb") {
+                r = Math.sqrt(value_percentage * Math.pow(gradient[1][1],2) + (1 - value_percentage) * Math.pow(gradient[0][1],2));
+                g = Math.sqrt(value_percentage * Math.pow(gradient[1][2],2) + (1 - value_percentage) * Math.pow(gradient[0][2],2));
+                b = Math.sqrt(value_percentage * Math.pow(gradient[1][3],2) + (1 - value_percentage) * Math.pow(gradient[0][3],2));
+            }
+            
+            // Clip to range (0, 255) and round to int value
+            if (gradientColors[0] == "rgb") {
+                r = Math.round(Math.max(Math.min(r, 255), 0));
+                g = Math.round(Math.max(Math.min(g, 255), 0));
+                b = Math.round(Math.max(Math.min(b, 255), 0));
+            } else if (gradientColors[0] == "hsl") {
+                r = Math.round(Math.max(Math.min(r, 360), 0));
+                g = Math.round(Math.max(Math.min(g, 100), 0));
+                b = Math.round(Math.max(Math.min(b, 100), 0));
+            }
+        }
+        
+        
+        // Return the color as a string
+        if (gradientColors[0] === "rgb") {
+            return 'rgba(' + r.toString() + ',' + g.toString() + ',' + b.toString() + ',' + a.toString() + ')';
+        } else if (gradientColors[0] === "hsl") {
+            return 'hsla(' + r.toString() + ',' + g.toString() + '%,' + b.toString() + '%,' + a.toString() + ')';
+        }
     }
 
     /**
@@ -353,20 +435,25 @@ class GDPChart {
      * @author  Jisha Pillai
      */
     getCountryPopulation(countryID, year) {
-        var population = 0;
-        this.populationData.data.map((val, idx, arr)=>{
-            if(this.populationData.data[idx]["Country Code"] === countryID){
-                console.log(this.populationData.data[idx]["Country Code"]);
-                console.log(this.populationData.data[idx][year]);  
-                population = this.populationData.data[idx][year]
-                
-                
-            }
-            
-            
-            
-        })
-       return population;
+//        var population = 0;
+//        this.populationData.data.map((val, idx, arr)=>{
+//            if(this.populationData.data[idx]["Country Code"] === countryID){
+//                console.log(this.populationData.data[idx]["Country Code"]);
+//                console.log(this.populationData.data[idx][year]);  
+//                population = this.populationData.data[idx][year]
+//                
+//                
+//            }
+//            
+//            
+//            
+//        })
+//       return population;
+        let countryIndex = this.populationData.ids[countryID];
+        if (this.populationData.data[countryIndex] !== undefined) {
+            return this.populationData.data[countryIndex][year];
+        }
+        return false;
     }
 
     /**
@@ -405,9 +492,44 @@ class GDPChart {
      * 
      * @param {string} mode Name of color mode desired
      */
-    colorMode(mode) {
+    changeColorMode(mode) {
+        // Only change the gradient if the desired color mode is different than the one currently applied
+        if (mode === this.colorMode) {
+            return;
+        }
+        this.colorMode = mode;
+        
+        // Update graph with new colors
+        this.chartjsObj.data.datasets.forEach((val, idx, arr)=> {
+            val.backgroundColor = this.getCountryColor(this.data.data[idx]["Country Code"], this.yearToDisplay);
+        })
+        this.updateChart()
     }
-
+    
+    /**
+     * Gets the color gradient for visualization;
+     */
+    get colorGradient() {
+        // Gradients are listed as an array of colors defined as [percentage, r, g, b[, a]] where a is optional.
+        let allGradients = {
+            default: ["rgb", [0, 255, 0, 0], [1, 0, 0, 255]],
+            white2red: ["rgb", [0, 255, 255, 255], [1, 255, 0, 0]],
+            white2blue: ["rgb", [0, 255, 255, 255], [1, 0, 0, 255]],
+            primaries: ["rgb", [0, 255, 0, 0], [0.75, 0, 255, 0], [1, 0, 0, 255]],
+            primariesHSL: ["hsl", [0, 0, 100, 50], [1, 240, 100, 50]],
+            ygb: ["hsl", [0, 59, 81, 69], [1, 207, 28, 19]]
+        }
+        
+        
+        // Check that colorMode is defined and is a valid colorMode
+        if (this.colorMode === undefined || !(this.colorMode in allGradients)) {
+            this.colorMode = "default";
+        }
+        
+        // Return the color gradient
+        return allGradients[this.colorMode];
+    }
+    
     /**
      * Updates the visualization's axis scales.
      * 

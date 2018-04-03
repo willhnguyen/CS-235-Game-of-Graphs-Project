@@ -16,6 +16,14 @@
         <!-- Dropdown for Year (Example) -->
         <label>Year Picker:</label> <select name="Year Picker" id="year-picker" onchange="yearPickerUpdated(this)">
         </select>
+        <label>Color Mode:</label> <select name="Color Picker" id="color-picker" onchange="gdpChart.changeColorMode(this.options[this.selectedIndex].value)">
+            <option value="default">Default</option>
+            <option value="primaries">Primary</option>
+            <option value="primariesHSL">PrimaryHSL</option>
+            <option value="ygb">Yellow-Green-Blue</option>
+            <option value="white2red">White-Red</option>
+            <option value="white2blue">White-Blue</option>
+        </select>
 
         <!-- ChartJS Visualization -->
         <div id="chart-container">
@@ -31,7 +39,7 @@
 
         <!-- Slider for Year -->
         <label>Year Slider:</label> <input type="range" id="year-slider" 
-        onmousemove="yearSliderUpdated(this)">
+        onchange="yearSliderUpdated(this)" oninput="yearSliderUpdated(this)">
 
         <h2>Analysis</h2>
         <p>{{ Information to be added here }}</p>
