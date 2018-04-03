@@ -358,6 +358,7 @@ class GDPChart {
      */
     getCountryColor(countryID, year) {
         let gradientColors = this.colorGradient;
+//        let gradient = [gradientColors[gradientColors.length-1], gradientColors[gradientColors.length-2]];
         let gradient = [];
         
         // Default color is a gray color (will stay this color if data is undefined for datapoint)
@@ -375,7 +376,7 @@ class GDPChart {
         }
         
         // Interpolate color value based on the data value
-        let data_min = Math.log(3e2);
+        let data_min = 0;
         let data_max = Math.log(2e5);
         if (value !== false && value !== undefined) {
             value = Math.log(value);
@@ -383,7 +384,7 @@ class GDPChart {
             
             // Get the colors to interpolate between
             for (let i = 2; i < gradientColors.length; ++i) {
-                if (value_percentage > gradientColors[i-1][0] && value_percentage < gradientColors[i][0]) {
+                if (value_percentage >= gradientColors[i-1][0] && value_percentage < gradientColors[i][0]) {
                     gradient = [gradientColors[i-1], gradientColors[i]];
                     break;
                 }
@@ -392,15 +393,14 @@ class GDPChart {
             // Normalize value_percentage based on gradient color range
             value_percentage = (value_percentage - gradient[0][0]) / (gradient[1][0] - gradient[0][0]);
             
-            // Calculate color with simple interpolation
+            // Calculate color by interpolation
             if (gradientColors[0] === "hsl") {
                 r = value_percentage * gradient[1][1] + (1 - value_percentage) * gradient[0][1];
                 g = value_percentage * gradient[1][2] + (1 - value_percentage) * gradient[0][2];
                 b = value_percentage * gradient[1][3] + (1 - value_percentage) * gradient[0][3];
-            }
-            
-            // Calculate color with light intensity considered
-            if (gradientColors[0] === "rgb") {
+            } else if (gradientColors[0] === "rgb") {
+                // For RGB, values are sqrt values of actual light intensities
+                // Need to square then square-root to provide more consistent light intensity gradients
                 r = Math.sqrt(value_percentage * Math.pow(gradient[1][1],2) + (1 - value_percentage) * Math.pow(gradient[0][1],2));
                 g = Math.sqrt(value_percentage * Math.pow(gradient[1][2],2) + (1 - value_percentage) * Math.pow(gradient[0][2],2));
                 b = Math.sqrt(value_percentage * Math.pow(gradient[1][3],2) + (1 - value_percentage) * Math.pow(gradient[0][3],2));
@@ -515,7 +515,7 @@ class GDPChart {
             default: ["rgb", [0, 255, 0, 0], [1, 0, 0, 255]],
             white2red: ["rgb", [0, 255, 255, 255], [1, 255, 0, 0]],
             white2blue: ["rgb", [0, 255, 255, 255], [1, 0, 0, 255]],
-            primaries: ["rgb", [0, 255, 0, 0], [0.75, 0, 255, 0], [1, 0, 0, 255]],
+            primaries: ["rgb", [0, 255, 0, 0], [0.5, 255, 255, 0], [1, 0, 0, 255]],
             primariesHSL: ["hsl", [0, 0, 100, 50], [1, 240, 100, 50]],
             ygb: ["hsl", [0, 59, 81, 69], [1, 207, 28, 19]]
         }
