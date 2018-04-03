@@ -1,12 +1,12 @@
 /**
  * GDPChart class for chart generation and updating.
- * 
+ *
  * This GDPChart.js file provides the class and methods necessary
  * to visualize the GDP vs. CO2 dataset provided by World Bank.
- * 
+ *
  * @link   http://github.com/willhnguyen/CS-235-Game-of-Graphs-Project/
- * 
- * @author Jisha Pillai (JP), RS, William Nguyen (WN)
+ *
+ * @author Jisha Pillai (JP), Raksha Sunil (RS), William Nguyen (WN)
  */
 
 /**
@@ -24,9 +24,9 @@ let chartElementID = 'gdp-chart';
 class GDPChart {
     /**
      * GDPChart constructor.
-     * 
+     *
      * Initializes the chart object state variables.
-     * 
+     *
      * @author  William Nguyen
      */
     constructor(chartElementID) {
@@ -42,9 +42,9 @@ class GDPChart {
 
     /**
      * Fetch visualization data.
-     * 
+     *
      * Obtain the data necessary for visualization by using a HTTP GET request.
-     * 
+     *
      * @author  William Nguyen
      */
     getData() {
@@ -71,9 +71,9 @@ class GDPChart {
     }
     /**
      * Fetch population data.
-     * 
+     *
      * Obtain the data necessary for visualization by using a HTTP GET request.
-     * 
+     *
      * @author  William Nguyen
      * @author  Jisha Pillai (editor)
      */
@@ -101,9 +101,9 @@ class GDPChart {
 
     /**
      * Generate chart with obtained data.
-     * 
+     *
      * Creates a new chart object and provides it data to visualize. This should only be called once.
-     * 
+     *
      * @author  Jisha Pillai
      * @author  William Nguyen (editor)
      */
@@ -120,12 +120,12 @@ class GDPChart {
                         y: val["CO2 Data"][this.yearToDisplay],
                         r: Math.log(this.getCountryPopulation(val["Country Code"], this.yearToDisplay))/2,
                         population: this.getCountryPopulation(val["Country Code"], this.yearToDisplay)
-                        
-                        
+
+
                     }
                  ]
              }
-             
+
         });
 
         let chartOptions = {
@@ -201,10 +201,10 @@ class GDPChart {
 
     /**
      * Update the visualization chart
-     * 
+     *
      * After the data has been updated, this method will tell the chart to update the visualization.
      * This method does not alter the data itself. Data changes must be made outside this function.
-     * 
+     *
      * @author  William Nguyen
      */
     updateChart() {
@@ -213,7 +213,7 @@ class GDPChart {
 
     /**
      * Update the visualization chart by a selected year.
-     * 
+     *
      * @param {number} year An integer value denoting the desired year to visualize.
      * @author  William Nguyen
      * @author  Jisha Pillai (editor)
@@ -238,7 +238,7 @@ class GDPChart {
 
     /**
      * Populate the sidebar information panel with country info.
-     * 
+     *
      * @param {string} countryID The 3-letter id of a country
      */
     showCountryInfo(countryID) {
@@ -250,7 +250,7 @@ class GDPChart {
 
     /**
      * Bubble-hover tooltip callback to populate its text.
-     * 
+     *
      * @param {object} t A single data point in the chart object's dataset
      * @param {object} d The entire dataset stored in the chart object
      * @author  Jisha Pillai
@@ -259,13 +259,13 @@ class GDPChart {
         // Show the information of identified country
         // showCountryInfo(0);
         console.log(d.datasets[t.datasetIndex]);
-        
+
         var population = d.datasets[t.datasetIndex].data[0].population;
 
         console.log(population);
-        
+
         return d.datasets[t.datasetIndex].label + ': (GDP: ' + t.xLabel.toFixed(5) + ', CO2: ' + t.yLabel.toFixed(5) + ', Population: ' + population + ')';
-        
+
     };
 
     /**
@@ -283,7 +283,7 @@ class GDPChart {
             if (chartEl.length > 0) {
                 // An element has been clicked.
                 let elementID = chartEl[0]._datasetIndex;
-                
+
                 // // Example of using it to extract dataset information
                 // console.log("HOVER!", chartEl);
                 // console.log(that.chartjsObj.data.datasets[elementID]);
@@ -309,7 +309,7 @@ class GDPChart {
             if (chartEl.length > 0) {
                 // An element has been clicked.
                 let elementID = chartEl[0]._datasetIndex;
-                
+
                 // // Example of using it to extract dataset information
                 // console.log("CLICK!", chartEl);
                 // console.log(that.chartjsObj.data.datasets[elementID]);
@@ -321,7 +321,7 @@ class GDPChart {
 
     /**
      * Callback for when a bubble has been selected.
-     * 
+     *
      * @param {string} countryID The 3-letter id of a country
      */
     countrySelected(countryID) {
@@ -341,7 +341,7 @@ class GDPChart {
 
     /**
      * Callback for when a bubble is hovered-over
-     * 
+     *
      * @param {string} countryID The 3-letter id of a country
      */
     countryHovered(countryID) {
@@ -351,7 +351,7 @@ class GDPChart {
 
     /**
      * Provides a color to visualize the country.
-     * 
+     *
      * @param {string} countryID The 3-letter id of a country
      * @param {number} year An integer value denoting the desired year to visualize
      * @author William Nguyen
@@ -360,13 +360,13 @@ class GDPChart {
         let gradientColors = this.colorGradient;
 //        let gradient = [gradientColors[gradientColors.length-1], gradientColors[gradientColors.length-2]];
         let gradient = [];
-        
+
         // Default color is a gray color (will stay this color if data is undefined for datapoint)
         let r = 85;
         let g = 85;
         let b = 85;
         let a = 0.5;
-        
+
         // Get a country value
         let colorDataKey = 'GDP Data';
         let countryIndex = this.data.ids[countryID];
@@ -374,14 +374,14 @@ class GDPChart {
         if (this.data.data[countryIndex][colorDataKey] !== undefined) {
             value = this.data.data[countryIndex][colorDataKey][year];
         }
-        
+
         // Interpolate color value based on the data value
         let data_min = 0;
         let data_max = Math.log(2e5);
         if (value !== false && value !== undefined) {
             value = Math.log(value);
             let value_percentage = (value - data_min) / (data_max - data_min);
-            
+
             // Get the colors to interpolate between
             for (let i = 2; i < gradientColors.length; ++i) {
                 if (value_percentage >= gradientColors[i-1][0] && value_percentage < gradientColors[i][0]) {
@@ -389,10 +389,10 @@ class GDPChart {
                     break;
                 }
             }
-            
+
             // Normalize value_percentage based on gradient color range
             value_percentage = (value_percentage - gradient[0][0]) / (gradient[1][0] - gradient[0][0]);
-            
+
             // Calculate color by interpolation
             if (gradientColors[0] === "hsl") {
                 r = value_percentage * gradient[1][1] + (1 - value_percentage) * gradient[0][1];
@@ -405,7 +405,7 @@ class GDPChart {
                 g = Math.sqrt(value_percentage * Math.pow(gradient[1][2],2) + (1 - value_percentage) * Math.pow(gradient[0][2],2));
                 b = Math.sqrt(value_percentage * Math.pow(gradient[1][3],2) + (1 - value_percentage) * Math.pow(gradient[0][3],2));
             }
-            
+
             // Clip to range (0, 255) and round to int value
             if (gradientColors[0] == "rgb") {
                 r = Math.round(Math.max(Math.min(r, 255), 0));
@@ -417,8 +417,8 @@ class GDPChart {
                 b = Math.round(Math.max(Math.min(b, 100), 0));
             }
         }
-        
-        
+
+
         // Return the color as a string
         if (gradientColors[0] === "rgb") {
             return 'rgba(' + r.toString() + ',' + g.toString() + ',' + b.toString() + ',' + a.toString() + ')';
@@ -429,7 +429,7 @@ class GDPChart {
 
     /**
      * Provides population data of a country.
-     * 
+     *
      * @param {string} countryID
      * @param {number} year An integer value denoting the desired year to visualize
      * @author  Jisha Pillai
@@ -439,14 +439,14 @@ class GDPChart {
 //        this.populationData.data.map((val, idx, arr)=>{
 //            if(this.populationData.data[idx]["Country Code"] === countryID){
 //                console.log(this.populationData.data[idx]["Country Code"]);
-//                console.log(this.populationData.data[idx][year]);  
+//                console.log(this.populationData.data[idx][year]);
 //                population = this.populationData.data[idx][year]
-//                
-//                
+//
+//
 //            }
-//            
-//            
-//            
+//
+//
+//
 //        })
 //       return population;
         let countryIndex = this.populationData.ids[countryID];
@@ -458,7 +458,7 @@ class GDPChart {
 
     /**
      * Provides GDP data of a country.
-     * 
+     *
      * @param {string} countryID The 3-letter id of a country
      * @param {number} year An integer value denoting the desired year to visualize
      */
@@ -467,7 +467,7 @@ class GDPChart {
 
     /**
      * Provides CO2 data of a country.
-     * 
+     *
      * @param {string} countryID The 3-letter id of a country
      * @param {number} year An integer value denoting the desired year to visualize
      */
@@ -476,20 +476,20 @@ class GDPChart {
 
     /**
      * Provides data on a particular data unit of a country.
-     * 
+     *
      * @param {string} countryID The 3-letter id of a country
      * @param {number} year An integer value denoting the desired year to visualize
      * @param {string} key The name of the data desired
      */
     getCountryInfo(countryID, year, key) {
     }
-    
+
     /**
      * Updates the visulization to a desired color mode.
-     * 
+     *
      * Color modes change the visualization color schemes to provide more
      * customizability and accessibility for the colorblind.
-     * 
+     *
      * @param {string} mode Name of color mode desired
      */
     changeColorMode(mode) {
@@ -498,14 +498,14 @@ class GDPChart {
             return;
         }
         this.colorMode = mode;
-        
+
         // Update graph with new colors
         this.chartjsObj.data.datasets.forEach((val, idx, arr)=> {
             val.backgroundColor = this.getCountryColor(this.data.data[idx]["Country Code"], this.yearToDisplay);
         })
         this.updateChart()
     }
-    
+
     /**
      * Gets the color gradient for visualization;
      */
@@ -519,24 +519,24 @@ class GDPChart {
             primariesHSL: ["hsl", [0, 0, 100, 50], [1, 240, 100, 50]],
             ygb: ["hsl", [0, 59, 81, 69], [1, 207, 28, 19]]
         }
-        
-        
+
+
         // Check that colorMode is defined and is a valid colorMode
         if (this.colorMode === undefined || !(this.colorMode in allGradients)) {
             this.colorMode = "default";
         }
-        
+
         // Return the color gradient
         return allGradients[this.colorMode];
     }
-    
+
     /**
      * Updates the visualization's axis scales.
-     * 
+     *
      * Axis scales can either be 'category', 'linear', 'logarithmic', or 'time'.
      * Certain axis scales can better visualize a dataset or clear away
      * visualization clutter.
-     * 
+     *
      * @param {string} mode Name of the axis range type
      */
     axisMode(mode) {
@@ -544,7 +544,7 @@ class GDPChart {
 
     /**
      * Draws chart legends to better understand data.
-     * 
+     *
      * For bubble charts, the data can be up to 4-dimensional (i.e. x-axis, y-axis,
      * radius, and color). At the very least, radius and color legends should be
      * displayed.
@@ -554,10 +554,10 @@ class GDPChart {
 
     /**
      * EXTRA: Filter the data to be visualized.
-     * 
+     *
      * Filter the data by some desired value. This should mainly be used for categorization.
      * Filtering by value range can also be possible but may require additional parameters.
-     * 
+     *
      * @param {string} key The key that should be used to filter the data
      * @param {*} filterValue The value that should be used to filter the data. Can
      *                        be an array of values.
@@ -567,11 +567,11 @@ class GDPChart {
 
     /**
      * EXTRA: Zooms the chart based on a user's axis range selection.
-     * 
+     *
      * The user can select a range on the chart. On mouse press up, the visualization
      * should update by zooming into the selected axes. This can also be used for
      * mouse scroll events.
-     * 
+     *
      * @param {string} axis The axis to zoom. Either 'x' or 'y'
      * @param {Array} range The range zoom into provided as a 2-tuple. (e.g. [0, 100])
      */
@@ -583,7 +583,7 @@ class GDPChart {
      */
     exportChartAsImage() {
     }
-    
-    
+
+
 
 }

@@ -1,12 +1,12 @@
 /**
  * GDP vs. CO2 chart visualization.
- * 
+ *
  * This main.js file provides the class and method class necessary
  * to visualize the GDP vs. CO2 dataset provided by World Bank.
- * 
+ *
  * @link   http://github.com/willhnguyen/CS-235-Game-of-Graphs-Project/
- * 
- * @author JP, RS, William Nguyen (WN)
+ *
+ * @author JP, Raksha Sunil (RS), William Nguyen (WN)
  */
 
  /**********************************************************************
@@ -15,7 +15,7 @@
 
 /**
  * Callback for when the year select dropdown experience an onchange event.
- * 
+ *
  * @param {Object} selectEl The DOM element for year-picker
  * @author  William Nguyen
  */
@@ -26,7 +26,7 @@ function yearPickerUpdated(selectEl) {
 
 /**
  * Callback for when the year slider experiences an onchange event.
- * 
+ *
  * @param {Object} sliderEl The DOM element for year-slider
  * @author  William Nguyen
  */
