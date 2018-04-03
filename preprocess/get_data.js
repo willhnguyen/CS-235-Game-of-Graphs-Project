@@ -170,7 +170,8 @@ getIndicator("SP.POP.TOTL", "Population", "../data/json/population.json");
 getIndicator("EN.ATM.CO2E.KT", "CO2", "../data/json/co2.json");
 
 // Save GDP Data
-getIndicator("NY.GDP.PCAP.KD.ZG", "GDP", "../data/json/gdp.json");
+// NY.GDP.PCAP.KD.ZG
+getIndicator("NY.GDP.PCAP.CD", "GDP", "../data/json/gdp.json");
 
 // Save Climate Change Data
 let climate_change_topic_path = "http://api.worldbank.org/v2/topics/19/indicators?per_page=100&format=json";
