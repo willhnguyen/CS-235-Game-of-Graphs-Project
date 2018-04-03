@@ -48,6 +48,7 @@ function yearSliderUpdated(sliderEl) {
  */
 const gdpChart = new GDPChart('gdp-chart');
 gdpChart.getData();
+gdpChart.getPopulationData();
 
 // Populate the year select dropdown list based on years available.
 let yearPicker = document.getElementById('year-picker');
