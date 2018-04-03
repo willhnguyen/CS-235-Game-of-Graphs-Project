@@ -6,15 +6,17 @@
  * 
  * @link   http://github.com/willhnguyen/CS-235-Game-of-Graphs-Project/
  * 
- * @author JP, RS, William Nguyen (WN)
+ * @author Jisha Pillai (JP), RS, William Nguyen (WN)
  */
 
 /**
  * Set the desired data location and the id of the chart element to update.
  */
-// let dataFilePath = '../data/json/combined_data.json';
-let /** !String */ dataFilePath = 'https://raw.githubusercontent.com/willhnguyen/CS-235-Game-of-Graphs-Project/master/data/json/combined_data.json';
+//let dataFilePath = '../data/json/gdp_co2_combined_data.json';
+let /** !String */ dataFilePath = 'https://raw.githubusercontent.com/willhnguyen/CS-235-Game-of-Graphs-Project/master/data/json/gdp_co2_combined_data.json';
+let /** !String */ dataFilePath1 = 'https://raw.githubusercontent.com/willhnguyen/CS-235-Game-of-Graphs-Project/master/data/json/population_data.json';
 let chartElementID = 'gdp-chart';
+
 
 /**
  * The main class to fetch data and update the bubble chart visualization.
@@ -28,7 +30,9 @@ class GDPChart {
      * @author  William Nguyen
      */
     constructor(chartElementID) {
+        this.population;
         this.data = {};
+        this.populationData = {};
         this.chartElement = document.getElementById(chartElementID);
         this.chartjsObj = new Chart(this.chartElement, {});
 
@@ -65,6 +69,35 @@ class GDPChart {
         httpRequest.open('GET', dataFilePath);
         httpRequest.send();
     }
+    /**
+     * Fetch population data.
+     * 
+     * Obtain the data necessary for visualization by using a HTTP GET request.
+     * 
+     * @author  William Nguyen
+     * @author  Jisha Pillai (editor)
+     */
+    getPopulationData() {
+        // Create AJAX request object to fetch JSON data
+        let httpRequest = new XMLHttpRequest();
+        if (!httpRequest) {
+            alert ('There was a problem fetching the data to populate the graph.');
+            return false;
+        }
+
+        httpRequest.onreadystatechange = ()=>{
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    // Store data for the object
+                    this.populationData = JSON.parse(httpRequest.responseText);
+                } else {
+                    alert ('The request did not return success code 200.');
+                }
+            }
+        };
+        httpRequest.open('GET', dataFilePath1);
+        httpRequest.send();
+    }
 
     /**
      * Generate chart with obtained data.
@@ -77,6 +110,7 @@ class GDPChart {
     generateChart() {
         // Set up the dataset to be passed to chartjs
         let chartData = this.data.data.map((val, idx, arr)=>{
+            console.log(this.getCountryPopulation(val["Country Code"], this.yearToDisplay));
             return {
                 label: val["Country Name"],
                 backgroundColor: "rgb(255, 0, 0)",
@@ -84,10 +118,14 @@ class GDPChart {
                     {
                         x: val["GDP Data"][this.yearToDisplay],
                         y: val["CO2 Data"][this.yearToDisplay],
-                        r: 10
+                        r: Math.log(this.getCountryPopulation(val["Country Code"], this.yearToDisplay))/2,
+                        population: this.getCountryPopulation(val["Country Code"], this.yearToDisplay)
+                        
+                        
                     }
-                ]
-            }
+                 ]
+             }
+             
         });
 
         let chartOptions = {
@@ -132,7 +170,8 @@ class GDPChart {
                         scaleLabel: {
                             display: 'true',
                             labelString: 'CO2 Emissions'
-                        }
+                        },
+                        type: 'logarithmic'
                     }
                 ]
             }
@@ -165,6 +204,7 @@ class GDPChart {
      * 
      * @param {number} year An integer value denoting the desired year to visualize.
      * @author  William Nguyen
+     * @author  Jisha Pillai (editor)
      */
     updateChartByYear(year) {
         // Make sure that year is an integer value, not a float.
@@ -174,7 +214,9 @@ class GDPChart {
         this.chartjsObj.data.datasets.forEach((val, idx, arr)=> {
             val.data[0].x = this.data.data[idx]["GDP Data"][year];
             val.data[0].y = this.data.data[idx]["CO2 Data"][year];
-            val.data[0].r = 10;
+            val.data[0].r = Math.log(this.getCountryPopulation(this.data.data[idx]["Country Code"], year))/2;
+            //console.log(this.data.data[idx]["Country Code"]);
+            //val.data[0].r = 10;
         })
 
         this.updateChart();
@@ -199,18 +241,24 @@ class GDPChart {
      * @param {object} d The entire dataset stored in the chart object
      * @author  Jisha Pillai
      */
-    updateTooltipLabel(t, d) {
+    updateTooltipLabel(t, d){
         // Show the information of identified country
         // showCountryInfo(0);
+        console.log(d.datasets[t.datasetIndex]);
+        
+        var population = d.datasets[t.datasetIndex].data[0].population;
 
-        return d.datasets[t.datasetIndex].label + ': (GDP: ' + t.xLabel.toFixed(5) + ', CO2: ' + t.yLabel.toFixed(5) + ')';
-    }
+        console.log(population);
+        
+        return d.datasets[t.datasetIndex].label + ': (GDP: ' + t.xLabel.toFixed(5) + ', CO2: ' + t.yLabel.toFixed(5) + ', Population: ' + population + ')';
+        
+    };
 
     /**
      * Callback for when the chart registers a hover event.
      */
     onHoverEvent() {
-        let that = this;
+        //let that = this;
 
         /**
          * Closure to provide context to GDPChart object as variable 'that'
@@ -300,10 +348,25 @@ class GDPChart {
     /**
      * Provides population data of a country.
      * 
-     * @param {string} countryID The 3-letter id of a country
+     * @param {string} countryID
      * @param {number} year An integer value denoting the desired year to visualize
+     * @author  Jisha Pillai
      */
     getCountryPopulation(countryID, year) {
+        var population = 0;
+        this.populationData.data.map((val, idx, arr)=>{
+            if(this.populationData.data[idx]["Country Code"] === countryID){
+                console.log(this.populationData.data[idx]["Country Code"]);
+                console.log(this.populationData.data[idx][year]);  
+                population = this.populationData.data[idx][year]
+                
+                
+            }
+            
+            
+            
+        })
+       return population;
     }
 
     /**
@@ -333,7 +396,7 @@ class GDPChart {
      */
     getCountryInfo(countryID, year, key) {
     }
-
+    
     /**
      * Updates the visulization to a desired color mode.
      * 
@@ -398,5 +461,7 @@ class GDPChart {
      */
     exportChartAsImage() {
     }
+    
+    
 
 }
