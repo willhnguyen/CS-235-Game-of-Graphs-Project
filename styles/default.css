@@ -55,6 +55,19 @@ h1 {
     width: 324px;
     height: 600px;
 }
+/*
 #year-slider {
     width: 300px;
+}
+*/
+#year-slider {
+    margin-top: 50px;
+}
+#year-slider, #year-slider * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
