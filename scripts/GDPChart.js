@@ -360,6 +360,7 @@ class GDPChart {
         let gradientColors = this.colorGradient;
 //        let gradient = [gradientColors[gradientColors.length-1], gradientColors[gradientColors.length-2]];
         let gradient = [];
+        const gamma = 2.2; // Standard for sRGB displays
 
         // Default color is a gray color (will stay this color if data is undefined for datapoint)
         let r = 85;
@@ -368,16 +369,16 @@ class GDPChart {
         let a = 0.5;
 
         // Get a country value
-        let colorDataKey = 'GDP Data';
-        let countryIndex = this.data.ids[countryID];
+        const colorDataKey = 'GDP Data';
+        const countryIndex = this.data.ids[countryID];
         let value = false;
         if (this.data.data[countryIndex][colorDataKey] !== undefined) {
             value = this.data.data[countryIndex][colorDataKey][year];
         }
 
         // Interpolate color value based on the data value
-        let data_min = 0;
-        let data_max = Math.log(2e5);
+        const data_min = 0;
+        const data_max = Math.log(2e5);
         if (value !== false && value !== undefined) {
             value = Math.log(value);
             let value_percentage = (value - data_min) / (data_max - data_min);
@@ -401,9 +402,9 @@ class GDPChart {
             } else if (gradientColors[0] === "rgb") {
                 // For RGB, values are sqrt values of actual light intensities
                 // Need to square then square-root to provide more consistent light intensity gradients
-                r = Math.sqrt(value_percentage * Math.pow(gradient[1][1],2) + (1 - value_percentage) * Math.pow(gradient[0][1],2));
-                g = Math.sqrt(value_percentage * Math.pow(gradient[1][2],2) + (1 - value_percentage) * Math.pow(gradient[0][2],2));
-                b = Math.sqrt(value_percentage * Math.pow(gradient[1][3],2) + (1 - value_percentage) * Math.pow(gradient[0][3],2));
+                r = Math.pow(value_percentage * Math.pow(gradient[1][1], gamma) + (1 - value_percentage) * Math.pow(gradient[0][1], gamma), 1 / gamma);
+                g = Math.pow(value_percentage * Math.pow(gradient[1][2], gamma) + (1 - value_percentage) * Math.pow(gradient[0][2], gamma), 1 / gamma);
+                b = Math.pow(value_percentage * Math.pow(gradient[1][3], gamma) + (1 - value_percentage) * Math.pow(gradient[0][3], gamma), 1 / gamma);
             }
 
             // Clip to range (0, 255) and round to int value
@@ -511,13 +512,15 @@ class GDPChart {
      */
     get colorGradient() {
         // Gradients are listed as an array of colors defined as [percentage, r, g, b[, a]] where a is optional.
-        let allGradients = {
+        const allGradients = {
             default: ["rgb", [0, 255, 0, 0], [1, 0, 0, 255]],
             white2red: ["rgb", [0, 255, 255, 255], [1, 255, 0, 0]],
             white2blue: ["rgb", [0, 255, 255, 255], [1, 0, 0, 255]],
             primaries: ["rgb", [0, 255, 0, 0], [0.5, 255, 255, 0], [1, 0, 0, 255]],
             primariesHSL: ["hsl", [0, 0, 100, 50], [1, 240, 100, 50]],
-            ygb: ["hsl", [0, 59, 81, 69], [1, 207, 28, 19]]
+            ygb: ["hsl", [0, 59, 81, 69], [1, 207, 28, 19]],
+            heat: ["hsl", [0, 60, 100, 85], [0.83, 0, 100, 77], [0.83, 360, 100, 77], [1, 348, 100, 37]],
+            bw: ["rgb", [0, 0, 0, 0], [1, 255, 255, 255]]
         }
 
 

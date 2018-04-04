@@ -17,12 +17,14 @@
         <label>Year Picker:</label> <select name="Year Picker" id="year-picker" onchange="yearPickerUpdated(this)">
         </select>
         <label>Color Mode:</label> <select name="Color Picker" id="color-picker" onchange="gdpChart.changeColorMode(this.options[this.selectedIndex].value)">
-            <option value="default">Default</option>
+            <option value="default" selected>Red-Blue</option>
             <option value="primaries">Primary</option>
             <option value="primariesHSL">PrimaryHSL</option>
             <option value="ygb">Yellow-Green-Blue</option>
             <option value="white2red">White-Red</option>
             <option value="white2blue">White-Blue</option>
+            <option value="heat">Heat</option>
+            <option value="bw">Black-White</option>
         </select>
 
         <!-- ChartJS Visualization -->
