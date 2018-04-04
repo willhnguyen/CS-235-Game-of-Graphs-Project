@@ -20,7 +20,16 @@ main {
 h1 {
     font-weight: 900;
     margin: 1em 0 0 0;
+    color:darkblue;
 }
+
+li {
+    font-family: 'Roboto', sans-serif;
+    font-size: 8;
+    color:brown;
+    line-height: 200%;
+}
+
 
 #subtitle {
     font-family: 700;
@@ -52,6 +61,7 @@ h1 {
     margin: 0;
     padding: 0 1em;
     background-color: #eeeeee;
+    list-style:disc;
     width: 324px;
     height: 600px;
 }
