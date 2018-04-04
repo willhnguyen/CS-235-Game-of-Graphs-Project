@@ -427,29 +427,56 @@ class GDPChart {
      * @param {number} year An integer value denoting the desired year to visualize
      * @author William Nguyen
      */
-    getCountryColor(countryID, year) {
-        let gradientColors = this.colorGradient;
-//        let gradient = [gradientColors[gradientColors.length-1], gradientColors[gradientColors.length-2]];
-        let gradient = [];
-        const gamma = 2.2; // Standard for sRGB displays
-
-        // Default color is a gray color (will stay this color if data is undefined for datapoint)
-        let r = 85;
-        let g = 85;
-        let b = 85;
-        let a = 0.5;
-
+    getCountryColor(countryID, year, key='GDP Data') {
         // Get a country value
-        const colorDataKey = 'GDP Data';
         const countryIndex = this.data.ids[countryID];
         let value = false;
-        if (this.data.data[countryIndex][colorDataKey] !== undefined) {
-            value = this.data.data[countryIndex][colorDataKey][year];
+        if (this.data.data[countryIndex][key] !== undefined) {
+            value = this.data.data[countryIndex][key][year];
         }
 
         // Interpolate color value based on the data value
         const data_min = 0;
         const data_max = Math.log(2e5);
+        if (value !== false && value !== undefined) {
+            return this.interpolateColor(value, data_min, data_max);
+        } else {
+            return 'rgba(85, 85, 85, 0.5)';
+        }
+    }
+    
+    /**
+     * Interpolate the color of a given value.
+     *
+     * Based on the min and max values of the dataset, the value should be interpolated accordingly.
+     *
+     * @param {number} value The value with which to dtermine an interpolated color value.
+     * @param {number} data_min The minimum to use to calculate the interpolation.
+     * @param {number} data_max The maximum to use to calculate the interpolation.
+     * @author William Nguyen
+     */
+    interpolateColor(value, data_min, data_max) {
+        let gradientColors = this.colorGradient;
+        let gradientColorType = gradientColors[0];
+        let gradient = [];
+        
+        const gamma = 2.2; // Standard for sRGB displays
+        const gamma_complement = 1 / gamma;
+        
+        // Define a default gradient in case fallback is required
+        gradient = [[0, 85, 85, 85], [1, 85, 85, 85]];
+        if (gradientColorType === 'hsl') {
+            gradient = [[0, 0, 0, 50], [1, 0, 0, 50]];
+        }
+
+        // Default color is a gray color (will stay this color if data is undefined for datapoint)
+        let color = [85, 85, 85];
+        let a = 0.5;
+        if (gradientColorType === 'hsl') {
+            color = [0, 0, 50];
+        }
+
+        // Interpolate color value based on the data value
         if (value !== false && value !== undefined) {
             value = Math.log(value);
             let value_percentage = (value - data_min) / (data_max - data_min);
@@ -464,38 +491,44 @@ class GDPChart {
 
             // Normalize value_percentage based on gradient color range
             value_percentage = (value_percentage - gradient[0][0]) / (gradient[1][0] - gradient[0][0]);
+            let value_percentage_complement = 1.0 - value_percentage;
 
             // Calculate color by interpolation
             if (gradientColors[0] === "hsl") {
-                r = value_percentage * gradient[1][1] + (1 - value_percentage) * gradient[0][1];
-                g = value_percentage * gradient[1][2] + (1 - value_percentage) * gradient[0][2];
-                b = value_percentage * gradient[1][3] + (1 - value_percentage) * gradient[0][3];
+                color = color.map((_, colorId)=>{
+                    return value_percentage * gradient[1][colorId+1] + value_percentage_complement * gradient[0][colorId+1];
+                });
             } else if (gradientColors[0] === "rgb") {
                 // For RGB, values are sqrt values of actual light intensities
                 // Need to square then square-root to provide more consistent light intensity gradients
-                r = Math.pow(value_percentage * Math.pow(gradient[1][1], gamma) + (1 - value_percentage) * Math.pow(gradient[0][1], gamma), 1 / gamma);
-                g = Math.pow(value_percentage * Math.pow(gradient[1][2], gamma) + (1 - value_percentage) * Math.pow(gradient[0][2], gamma), 1 / gamma);
-                b = Math.pow(value_percentage * Math.pow(gradient[1][3], gamma) + (1 - value_percentage) * Math.pow(gradient[0][3], gamma), 1 / gamma);
+                color = color.map((_, colorId)=>{
+                    return Math.pow(
+                        value_percentage * Math.pow(gradient[1][colorId+1], gamma) + value_percentage_complement * Math.pow(gradient[0][colorId+1], gamma),
+                        gamma_complement
+                    );
+                });
             }
 
-            // Clip to range (0, 255) and round to int value
+            // Clip to proper ranges and round to int value
+            color = color.map((val)=>Math.max(val, 0));
             if (gradientColors[0] == "rgb") {
-                r = Math.round(Math.max(Math.min(r, 255), 0));
-                g = Math.round(Math.max(Math.min(g, 255), 0));
-                b = Math.round(Math.max(Math.min(b, 255), 0));
+                color = color.map((val)=>{
+                    return Math.min(val, 255);
+                })
             } else if (gradientColors[0] == "hsl") {
-                r = Math.round(Math.max(Math.min(r, 360), 0));
-                g = Math.round(Math.max(Math.min(g, 100), 0));
-                b = Math.round(Math.max(Math.min(b, 100), 0));
+                color[0] = Math.min(color[0], 360);
+                color[1] = Math.min(color[1], 100);
+                color[2] = Math.min(color[2], 100);
             }
+            color = color.map((val)=>Math.round(val));
         }
 
 
         // Return the color as a string
         if (gradientColors[0] === "rgb") {
-            return 'rgba(' + r.toString() + ',' + g.toString() + ',' + b.toString() + ',' + a.toString() + ')';
+            return 'rgba(' + color[0].toString() + ',' + color[1].toString() + ',' + color[2].toString() + ',' + a.toString() + ')';
         } else if (gradientColors[0] === "hsl") {
-            return 'hsla(' + r.toString() + ',' + g.toString() + '%,' + b.toString() + '%,' + a.toString() + ')';
+            return 'hsla(' + color[0].toString() + ',' + color[1].toString() + '%,' + color[2].toString() + '%,' + a.toString() + ')';
         }
     }
 
