@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="./styles/default.css">
+    <link rel="stylesheet" href="./styles/slider.css">
     <title>Game of Graphs</title>
 </head>
 <body>
@@ -39,8 +40,12 @@
         </div>
 
         <!-- Slider for Year -->
-        <label>Year Slider:</label> <input type="range" id="year-slider" 
-        onchange="yearSliderUpdated(this)" oninput="yearSliderUpdated(this)">
+        
+        <div style="position: relative; width: 600px;">
+            <div id="year-slider" style="margin-bottom: 4em;">
+                <footer style="position:absolute; top: 1em; text-align: center; width: 100%">Year</footer>
+            </div>
+        <div>
 
         <h2>Analysis</h2>
         <p>{{ Information to be added here }}</p>
@@ -53,5 +58,6 @@
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
 <script src="./scripts/GDPChart.js"></script>
+<script src="./scripts/slider.js"></script>
 <script src="./scripts/main.js"></script>
 </html>
