@@ -160,10 +160,14 @@ class GDPChart {
                         },
                         ticks: {
                             autoSkip: false,
-                            beginAtZero: true,
-                            min: 0,
-                            max: 2e5
+//                            beginAtZero: true,
+                            min: 50,
+                            max: 2e5,
+                            // maxRotation: 90,
+                            // minRotation: 90,
+                            callback: this.defineLogTickLabels
                         },
+                        afterBuildTicks: this.defineLogTicks(50, 2e5),
                         type: 'logarithmic'
                     }
                 ],
@@ -179,10 +183,12 @@ class GDPChart {
                         },
                         ticks: {
                             autoSkip: false,
-                            beginAtZero: true,
-                            min: 0,
-                            max: 2e7
+//                            beginAtZero: true,
+                            min: 5,
+                            max: 2e7,
+                            callback: this.defineLogTickLabels
                         },
+                        afterBuildTicks: this.defineLogTicks(5, 2e7),
                         type: 'logarithmic'
                     }
                 ]
@@ -198,7 +204,72 @@ class GDPChart {
             options: chartOptions
         })
     }
+    
+    /**
+     * Outputs a filtered list of tick values for logarithmic scale.
+     *
+     * This custom function filters out unnecessary tick labels for the logarithmic scale. The
+     * labels left are the staring tick label, ending tick label, and all tick labels beginning
+     * with either a '5' or a '1'.
+     *
+     * @param {number} tick The value of the current tick
+     * @param {number} index The index of the current tick in the [number] parameter named ticks
+     * @param {[number]} ticks The list of tick values shown
+     * @author William Nguyen
+     */
+    defineLogTickLabels(tick, index, ticks) {
+        // Get Most Significant digit
+        const mostSigDigit = tick.toLocaleString()[0];
 
+        // Keep tick label if the tick is for value 0
+        if (tick.toLocaleString() === "0") {
+            return "0";
+        }
+        // Keep tick label if the tick is the beginning or last tick value
+        else if (index === ticks.length - 1 || index === 0) {
+            return tick.toLocaleString();
+        } 
+        // Remove labels for ticks beginning with 1 or 5
+        else if (mostSigDigit !== "5" && mostSigDigit !== "1") {
+            return "";
+        }
+
+        return tick.toLocaleString();
+    }
+    
+    /**
+     * Returns a closure that calculates the ticks marks to show on the chart.
+     *
+     * Although Chart.js already determines tick marks, the tick marks moves when the chart updates.
+     * This custom closure sets the tick marks to a defined set of ticks and the ticks don't move anymore.
+     * 
+     * @param {number} minTick The value of the maxTick to use
+     * @param {number} maxTick The value of the minTick to use
+     * @author William Nguyen
+     */
+    defineLogTicks(minTick, maxTick) {
+        return (scale)=>{
+            let newTicks = [];
+
+            for (let i = minTick, scale = Math.pow(10, Math.floor(Math.log10(minTick))); i <= maxTick; ) {
+                if (i.toString()[0] === '5' || i.toString()[0] === '1') {
+                    newTicks.push(i);
+                }
+                i += scale;
+                if (i === 10 * scale) {
+                    scale *= 10;
+                }
+            }
+            if (maxTick !== newTicks[newTicks.length-1]) {
+                newTicks.push(maxTick);
+            }
+
+            scale.ticks = newTicks;
+
+            return;
+        }
+    }
+    
     /**
      * Update the visualization chart
      *
