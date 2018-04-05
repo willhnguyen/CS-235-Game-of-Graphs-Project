@@ -106,6 +106,7 @@ class GDPChart {
      *
      * @author  Jisha Pillai
      * @author  William Nguyen (editor)
+     * @author Raksha Sunil (editor)
      */
     generateChart() {
         // Set up the dataset to be passed to chartjs
@@ -123,14 +124,16 @@ class GDPChart {
                         methaneEmmisions: val["Methane emissions (kt of CO2 equivalent)"][this.yearToDisplay],
                         otherGasEmmissions: val["Other greenhouse gas emissions (% change from 1990)"][this.yearToDisplay],
                         oilUsage: val["Energy use (kg of oil equivalent per capita)"][this.yearToDisplay],
-                        powerConsumption: val["Electric power consumption (kWh per capita)"][this.yearToDisplay]
-                   
+                        powerConsumption: val["Electric power consumption (kWh per capita)"][this.yearToDisplay],
+                        forestArea: val["Forest area (sq. km)"][this.yearToDisplay],
+                        cerealYield: val["Cereal yield (kg per hectare)"][this.yearToDisplay],
+                        waterAccess: val["Improved water source (% of population with access)"][this.yearToDisplay]
                     }
                  ]
              }
 
         });
-        
+
 
         let chartOptions = {
             title: {
@@ -199,9 +202,9 @@ class GDPChart {
                 ]
             }
         }
-        
-        
-        
+
+
+
 
 
         this.chartjsObj = new Chart(this.chartElement, {
@@ -212,8 +215,8 @@ class GDPChart {
             options: chartOptions,
         })
     }
-    
-    
+
+
      /**
      * Outputs a filtered list of tick values for logarithmic scale.
      *
@@ -237,7 +240,7 @@ class GDPChart {
         // Keep tick label if the tick is the beginning or last tick value
         else if (index === ticks.length - 1 || index === 0) {
             return tick.toLocaleString();
-        } 
+        }
         // Remove labels for ticks beginning with 1 or 5
         else if (mostSigDigit !== "5" && mostSigDigit !== "1") {
             return "";
@@ -245,13 +248,13 @@ class GDPChart {
 
         return tick.toLocaleString();
     }
-    
+
     /**
      * Returns a closure that calculates the ticks marks to show on the chart.
      *
      * Although Chart.js already determines tick marks, the tick marks moves when the chart updates.
      * This custom closure sets the tick marks to a defined set of ticks and the ticks don't move anymore.
-     * 
+     *
      * @param {number} minTick The value of the maxTick to use
      * @param {number} maxTick The value of the minTick to use
      * @author William Nguyen
@@ -278,8 +281,8 @@ class GDPChart {
             return;
         }
     }
-    
-    
+
+
     /**
      * Update the visualization chart
      *
@@ -291,8 +294,8 @@ class GDPChart {
     updateChart() {
         this.chartjsObj.update();
     }
-    
-    
+
+
 
     /**
      * Update the visualization chart by a selected year.
@@ -602,6 +605,7 @@ class GDPChart {
      * @param {object} t A single data point in the chart object's dataset
      * @param {object} d The entire dataset stored in the chart object
      * @author  Jisha Pillai
+     * @author Raksha Sunil (edited)
      */
     getChartInfo(t, d){
         var text = [];
@@ -611,6 +615,9 @@ class GDPChart {
         var otherGasEmmissions = (d.datasets[t.datasetIndex].data[0].otherGasEmmissions);
         var oilUsage = (d.datasets[t.datasetIndex].data[0].oilUsage);
         var powerConsumption = (d.datasets[t.datasetIndex].data[0].powerConsumption);
+        var forestArea = (d.datasets[t.datasetIndex].data[0].forestArea);
+        var cerealYield = (d.datasets[t.datasetIndex].data[0].cerealYield);
+        var waterAccess = (d.datasets[t.datasetIndex].data[0].waterAccess);
         text.push('<h1>'+d.datasets[t.datasetIndex].label+'</h1>');
         text.push('<li>'+'GDP: ' + t.xLabel.toFixed(2) + '</li>');
         text.push('<li>'+'CO2(kt): ' + t.yLabel.toFixed(2) +'</li>');
@@ -622,18 +629,27 @@ class GDPChart {
             text.push('<li>'+'Methane emissions: ' + methaneEmmisions.toFixed(2) +'</li>');
         }
         if(otherGasEmmissions!= undefined){
-            text.push('<li>'+'Other greenhouse gas emissions' + otherGasEmmissions.toFixed(2) +'</li>');
+            text.push('<li>'+'Other greenhouse gas emissions: ' + otherGasEmmissions.toFixed(2) +'</li>');
         }
         if(oilUsage!= undefined){
-            text.push('<li>'+'Energy use(kg oil per capita):' + oilUsage.toFixed(2) +'</li>');
+            text.push('<li>'+'Energy use(kg oil per capita): ' + oilUsage.toFixed(2) +'</li>');
         }
-       
+        if(forestArea!= undefined){
+          text.push('<li>'+'Forest Area(sq. km): ' + forestArea.toFixed(2) +'</li>');
+        }
+        if(cerealYield!= undefined){
+          text.push('<li>'+'Cereal Yield(kg per hectare): ' + cerealYield.toFixed(2) +'</li>');
+        }
+        if(waterAccess!= undefined){
+          text.push('<li>'+'Water Accessibility(%): ' + waterAccess.toFixed(2) +'</li>');
+        }
+
         document.getElementById('chart-info').innerHTML = text.join("");
-       
+
     }
-        
-                
-        
+
+
+
 
 
     /**
@@ -689,8 +705,8 @@ class GDPChart {
      */
     exportChartAsImage() {
     }
-    
-   
+
+
 
 
 
