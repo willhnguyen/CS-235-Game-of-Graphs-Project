@@ -149,8 +149,8 @@ class GDPChart {
                     label: this.updateTooltipLabel
                 }
             },
-            legend: {
-                display: false
+           legend: {
+                display: false,
             },
             scaleBeginAtZero: 'false',
             responsive: 'true',
@@ -200,8 +200,40 @@ class GDPChart {
                         type: 'logarithmic'
                     }
                 ]
+            },
+            pan: {
+                // Boolean to enable panning
+                enabled: true,
+
+                // Panning directions. Remove the appropriate direction to disable 
+                // Eg. 'y' would only allow panning in the y direction
+                mode: 'xy',
+                limits: {
+				   xmin: 1e-4,
+				   ymin: -50,
+				   ymax: 10
+				},
+				xScale0: {
+						max: 1e4
+					}
+            },
+
+            // Container for zoom options
+            zoom: {
+                // Boolean to enable zooming
+                enabled: true,
+                drag: true,
+
+                // Zooming directions. Remove the appropriate direction to disable 
+                // Eg. 'y' would only allow zooming in the y direction
+                mode: 'xy',
+                sensitivity: 10,
+				limits: {
+				  max: 10,
+				  min: 0.5
+				}
             }
-        }
+          }
 
 
 
