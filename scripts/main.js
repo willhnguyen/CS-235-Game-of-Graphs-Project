@@ -59,6 +59,6 @@ for (let i = 1990; i <= 2014; ++i) {
 // Select the most recent year
 yearPicker.selectedIndex = yearPicker.length - 1;
 
-// Create custom year slider 
+// Create custom year slider
 let yearSlider = new Slider('year-slider', 1990, 2014, 1, [1990, 1995, 2000, 2005, 2010, 2014], function(i) {return gdpChart.updateChartByYear(i);});
 yearSlider.selectedVal(2014);

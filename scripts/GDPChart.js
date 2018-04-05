@@ -106,7 +106,7 @@ class GDPChart {
      *
      * @author  Jisha Pillai
      * @author  William Nguyen (editor)
-     * @author Raksha Sunil (editor)
+     * @author  Raksha Sunil (editor)
      */
     generateChart() {
         // Set up the dataset to be passed to chartjs
@@ -605,7 +605,7 @@ class GDPChart {
      * @param {object} t A single data point in the chart object's dataset
      * @param {object} d The entire dataset stored in the chart object
      * @author  Jisha Pillai
-     * @author Raksha Sunil (edited)
+     * @author  Raksha Sunil (edited)
      */
     getChartInfo(t, d){
         var text = [];
