@@ -28,6 +28,7 @@ li {
     font-size: 8;
     color:brown;
     line-height: 200%;
+    list-style-type: none;
 }
 
 
