@@ -1,3 +1,8 @@
+/*  @author  Raksha Sunil(edited)
+*/
+
+
+
 /* Importing Google's Roboto Font Family */
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,700,900');
 
@@ -26,10 +31,15 @@ h1 {
 li {
     font-family: 'Roboto', sans-serif;
     font-size: 8;
-    color:brown;
+    font-weight:bolder;
+    color:black;
     line-height: 200%;
     list-style-type: none;
 }
+
+li span {
+            font-weight: normal;
+          }
 
 
 #subtitle {
