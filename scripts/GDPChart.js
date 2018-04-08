@@ -143,9 +143,8 @@ class GDPChart {
             onHover: this.onHoverEvent(),
             onClick: this.onClickEvent(),
             tooltips: {
-                       //mode: 'nearest',
                        position: 'nearest',
-                       intersect: false,
+                       intersect: true,
                        //backgroundColor: 'rgba(0, 0, 255, 0)',
 						           titleFontColor: 'white',
 						           bodyFontColor: 'white',
