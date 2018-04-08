@@ -118,15 +118,7 @@ class GDPChart {
                         x: val["GDP Data"][this.yearToDisplay],
                         y: val["CO2 Data"][this.yearToDisplay],
                         r: Math.log(this.getCountryPopulation(val["Country Code"], this.yearToDisplay))/2,
-                        population: this.getCountryPopulation(val["Country Code"], this.yearToDisplay),
-                        agriculturalLand: val["Agricultural land (sq. km)"][this.yearToDisplay],
-                        methaneEmmisions: val["Methane emissions (kt of CO2 equivalent)"][this.yearToDisplay],
-                        otherGasEmmissions: val["Other greenhouse gas emissions (% change from 1990)"][this.yearToDisplay],
-                        oilUsage: val["Energy use (kg of oil equivalent per capita)"][this.yearToDisplay],
-                        powerConsumption: val["Electric power consumption (kWh per capita)"][this.yearToDisplay],
-                        forestArea: val["Forest area (sq. km)"][this.yearToDisplay],
-                        cerealYield: val["Cereal yield (kg per hectare)"][this.yearToDisplay],
-                        waterAccess: val["Improved water source (% of population with access)"][this.yearToDisplay]
+                        "Country Code": val["Country Code"]
                     }
                  ]
              }
@@ -149,7 +141,7 @@ class GDPChart {
 						           borderColor: 'rgba(0,0,0,1)',
 						           borderWidth: 1.2,
                        callbacks: {
-                                  beforeLabel : this.getChartInfo,
+                                  beforeLabel : this.getChartInfo(),
                                   label: this.updateTooltipLabel
                        }
             },
@@ -360,12 +352,65 @@ class GDPChart {
      * Populate the sidebar information panel with country info.
      *
      * @param {string} countryID The 3-letter id of a country
+     * @author Jisha Pillai
+     * @author Raksha Sunil (edited)
+     * @author William Nguyen (edited)
      */
     showCountryInfo(countryID) {
-        let chartInfoDiv = document.getElementById('chart-info');
-
+        // Don't need to update if the country is already shown
+        if (countryID === this.countryInfoShown) {
+            return;
+        }
+        this.countryInfoShown = countryID;
+        
+        // Define data to display
+        let dataToDisplay = [
+            {
+                label: 'GDP',
+                key: 'GDP Data'
+            }, {
+                label: 'CO<sub>2</sub> (Kt)',
+                key: 'CO2 Data'
+            }, {
+                label: 'Population',
+                key: 'Population Data'
+            }, {
+                label: 'Agricultural land (sq. km)',
+                key: 'Agricultural land (sq. km)'
+            }, {
+                label: 'Energy use (kg of oil per capita)',
+                key: 'Energy use (kg of oil equivalent per capita)'
+            }, {
+                label: 'Forest area (sq. km)',
+                key: 'Forest area (sq. km)'
+            }, {
+                label: 'Cereal yield (kg per hectare)',
+                key: 'Cereal yield (kg per hectare)'
+            }, {
+                label: 'Water Accessibility (% of population)',
+                key: 'Improved water source (% of population with access)'
+            }
+        ];
+        
+        // Defined helper function to make adding new elements easier
+        function addNewLi(label, info) {
+            return `<li> ${label}: <span>${info.toLocaleString()}</li></span>`;
+        }
+        
+        // Generate the HTML to display
+        let HTMLarray = [];
+        HTMLarray.push('<h1>'+this.data.data[this.data.ids[countryID]]["Country Name"]+'</h1>');
+        
+        for (let dataInfo of dataToDisplay) {
+            let foundInfo = this.getCountryInfo(countryID, this.yearToDisplay, dataInfo.key);
+            if (foundInfo !== undefined) {
+                HTMLarray.push(addNewLi(dataInfo.label, foundInfo));
+            }
+        }
+        
         // Update information to be displayed
-        chartInfoDiv.innerHTML = chartInfoDiv.innerHTML;
+        let chartInfoDiv = document.getElementById('chart-info');
+        chartInfoDiv.innerHTML = HTMLarray.join("");
     }
 
     /**
@@ -429,6 +474,7 @@ class GDPChart {
             if (chartEl.length > 0) {
                 // An element has been clicked.
                 let elementID = chartEl[0]._datasetIndex;
+                console.log(elementID);
 
                 // // Example of using it to extract dataset information
                 // console.log("CLICK!", chartEl);
@@ -690,76 +736,18 @@ class GDPChart {
      * @param {object} d The entire dataset stored in the chart object
      * @author  Jisha Pillai
      * @author  Raksha Sunil (edited)
-     * @author  William Nguyen (edited)
+     * @author  William Nguyen (edited) Moved majority of code into this.showCountryInfo(countryID) method
      */
-    getChartInfo(t, d){
-        var text = [];
-        let pointIndex = t.datasetIndex;
+    getChartInfo() {
+        let that = this;
         
-        // Check if the country already is showing and only update if different ceountry
-        if (this.hoveredElementIndex === pointIndex) {
-            return;
-        }
-        
-        // Set the currently hovered element index
-        this.hoveredElementIndex = pointIndex;
-        
-        // Get each datapoint of the dataset
-        let datapoint = d.datasets[pointIndex].data[0];
-        var population = datapoint.population;
-        var agriculturalLand = datapoint.agriculturalLand;
-        var methaneEmmisions = datapoint.methaneEmmisions;
-        var otherGasEmmissions = datapoint.otherGasEmmissions;
-        var oilUsage = datapoint.oilUsage;
-        var powerConsumption = datapoint.powerConsumption;
-        var forestArea = datapoint.forestArea;
-        var cerealYield = datapoint.cerealYield;
-        var waterAccess = datapoint.waterAccess;
-        
-        
-        // Defined helper function to make adding new elements easier
-        function addNewLi(label, info) {
-            return `<li> ${label}: <span>${info.toLocaleString()}</li></span>`;
-        }
-        
-        // These values are guaranteed as they are visible in the chart
-        text.push('<h1>'+d.datasets[pointIndex].label+'</h1>');
-        text.push(addNewLi("GDP", t.xLabel))
-        text.push(addNewLi("CO<sub>2</sub> (Kt)", t.yLabel))
-        text.push(addNewLi("Population", population))
-        
-        // Add the extra information if they exist
-        if(agriculturalLand!= undefined){
-            let newLi = addNewLi("Agricultural land (sq. km)", agriculturalLand);
-            text.push(newLi);
-        }
-        if(methaneEmmisions!= undefined){
-            let newLi = addNewLi("Methane emissions", methaneEmmisions);
-            text.push(newLi);
-        }
-        if(otherGasEmmissions!= undefined){
-            let newLi = addNewLi("Other greenhouse gas emissions", otherGasEmmissions);
-            text.push(newLi);
-        }
-        if(oilUsage!= undefined){
-            let newLi = addNewLi("Energy use (kg oil per capita)", oilUsage);
-            text.push(newLi);
-        }
-        if(forestArea!= undefined){
-            let newLi = addNewLi("Forest Area (sq. km)", forestArea);
-            text.push(newLi);
-        }
-        if(cerealYield!= undefined){
-            let newLi = addNewLi("Cereal Yield (kg per hectare)", cerealYield);
-            text.push(newLi);
-        }
-        if(waterAccess!= undefined){
-            let newLi = addNewLi("Water Accessibility (%)", waterAccess);
-            text.push(newLi);
-        }
+        // Closure to encapuslate reference to class object
+        return function (t, d) {
+            let pointIndex = t.datasetIndex;
+            let countryCode = d.datasets[pointIndex].data[0]["Country Code"];
 
-        document.getElementById('chart-info').innerHTML = text.join("");
-
+            that.showCountryInfo(countryCode);
+        }
     }
 
     /**
