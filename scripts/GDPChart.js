@@ -295,7 +295,8 @@ class GDPChart {
     checkKeyInput(event){
         switch(event.keyCode) {
             case 27:
-                gdpChart.chartjsObj.resetZoom();
+//                this.chartjsObj.resetZoom();
+                this.generateChart();
                 break;
             case 37: // Left Arrow Key
             case 65:
@@ -730,7 +731,7 @@ class GDPChart {
      * @param {number} year An integer value denoting the desired year to visualize
      * @author William Nguyen
      */
-    getCountryColor(countryID, year, key='GDP Data') {
+    getCountryColor(countryID, year, key='Forest area (sq. km)') {
         // Get a country value
         const countryIndex = this.data.ids[countryID];
         let value = false;
@@ -745,7 +746,7 @@ class GDPChart {
 
         // Interpolate color value based on the data value
         const data_min = 0;
-        const data_max = Math.log(2e5);
+        const data_max = Math.log(1e7);
         if (value !== false && value !== undefined) {
             return this.interpolateColor(value, data_min, data_max);
         } else {
