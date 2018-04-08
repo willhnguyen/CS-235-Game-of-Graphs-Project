@@ -45,7 +45,6 @@ document.addEventListener('mouseup', function (mouseFlags) {
         // Check if in rect
         let inRect = (mouseY < rect.top + rect.height && mouseY > rect.top) && (mouseX < rect.left + rect.width && mouseX > rect.left);
         if (!inRect) {
-            console.log("drag resetting");
             document.onmousemove = null;
             mouseFlags.dragFlag = false;
             mouseFlags.mouseDownFlag = false;
@@ -73,6 +72,7 @@ class GDPChart {
 
         this.yearToDisplay = 2014;
         this.countrySelectedID = undefined;
+        document.getElementById('chart-info').innerHTML = "<p>Please select a country's bubble to the left to see relevant data.</p>";
     }
 
     /**
@@ -293,13 +293,28 @@ class GDPChart {
      * @author Jisha Pillai
      */
     checkKeyInput(event){
-        if (event.keyCode == 27) {
-             //alert('Esc key pressed.');
-             gdpChart.chartjsObj.resetZoom();  
-           }
+        switch(event.keyCode) {
+            case 27:
+                gdpChart.chartjsObj.resetZoom();
+                break;
+            case 37: // Left Arrow Key
+            case 65:
+                this.getNextClosestElement("left");
+                break;
+            case 38: // Up Arrow Key
+            case 87:
+                this.getNextClosestElement("up");
+                break;
+            case 39: // Right Arrow Key
+            case 68:
+                this.getNextClosestElement("right");
+                break;
+            case 40: // Down Arrow Key
+            case 83:
+                this.getNextClosestElement("down");
+                break;
+        }
     }
-
-
 
      /**
      * Outputs a filtered list of tick values for logarithmic scale.
@@ -378,8 +393,6 @@ class GDPChart {
     updateChart() {
         this.chartjsObj.update();
     }
-
-
 
     /**
      * Update the visualization chart by a selected year.
@@ -603,7 +616,7 @@ class GDPChart {
      */
     countryDeselected() {
         // Reset countrySelected state and show general chart info
-        this.countrySelectedID = -1;
+        this.countrySelectedID = undefined;
         this.showCountryInfo(undefined);
         
         // Change bubble's stroke size
@@ -909,6 +922,136 @@ class GDPChart {
             axis.type = mode;
             this.updateChart();
         }
+    }
+    
+    /**
+     * If an element is selected, then allow the user to move to nearby bubbles using
+     * the arrow keys.
+     *
+     * @param {string} mode The direction to move
+     * @author William Nguyen
+     */
+    getNextClosestElement(mode) {
+        // If no element selected, then can't switch.
+        if (this.countrySelectedID === undefined) {
+            return;
+        }
+        
+        // Get the current country's info
+        let currBubble = this.chartjsObj.data.datasets[this.countrySelectedDatasetID];
+        let currX = Math.log(currBubble.data[0].x);
+        let currY = Math.log(currBubble.data[0].y);
+        let currCode = currBubble.data[0]['Country Code'];
+        
+        // Helper functions
+        function distance(x1, y1, x2, y2) {
+            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        }
+        function normalize(x, y) {
+            let dist = distance(0, 0, x, y);
+            return [x / dist, y / dist];
+        }
+        function getAngle(x1, y1, x2, y2) {
+            let point = [x2 - x1, y2 - y1];
+            point = normalize(point[0], point[1]);
+            let angleRad = Math.atan2(point[1], point[0]);
+            
+            return angleRad;
+        }
+        
+        // Process all points to get distance and angle from point of interest
+        let distances = this.chartjsObj.data.datasets.map((el, index)=>{
+            let elX = Math.log(el.data[0].x);
+            let elY = Math.log(el.data[0].y);
+            let elCode = el.data[0]['Country Code'];
+            
+            let dist = distance(currX, currY, elX, elY);
+            let angle = getAngle(currX, currY, elX, elY) * 180 / Math.PI;
+            
+            return {
+                dist: dist,
+                angle: angle,
+                "Country Code": elCode,
+                id: index, 
+                points: [currX, currY, elX, elY],
+                orig: [el.data[0].x, el.data[0].y],
+                norm: normalize(elX - currX, elY - currY)
+            }
+        });
+        
+        // Filter the points of interests by direction
+        distances = distances.filter((el, index)=>{
+            // Ignore if the bubble represents the current country
+            if (el.id === currCode) {
+                return false;
+            }
+            
+            // Filter by direction
+            if(mode === "up"){
+                return ((el.angle > 45) && (el.angle <= 135));
+            } else if (mode === "down") {
+                return ((el.angle <= -45) && (el.angle > -135));
+            } else if (mode === "left") {
+                return (((el.angle > 135) && (el.angle <= 180)) ||
+                    ((el.angle <= -135) && (el.angle >= -180)));
+            } else if (mode === "right") {
+                return ((el.angle <= 45) && (el.angle > -45));
+            }
+        });
+        
+        // If there are no elements available, then don't do anything
+        if (distances.length === 0) {
+            return;
+        }
+        
+        let angleOfInterest = 0;
+        if (mode === "up") {
+            angleOfInterest = 90;
+        } else if (mode === "down") {
+            angleOfInterest = -90;
+        } else if (mode === "right") {
+            angleOfInterest = 0;
+        } else if (mode === "left") {
+            angleOfInterest = 180;
+        }
+        
+        // Get the shortest distance point closest to angle of interest
+        let closestPoint = distances.reduce((a, b)=>{
+//            // Determine best angle value to use
+//            let aAngle = a.angle;
+//            let bAngle = b.angle;
+//            if (mode === "left") {
+//                // Make entirely positive
+//                if (a.angle < 0) {
+//                    aAngle += 360;
+//                }
+//                if (b.angle < 0) {
+//                    bAngle += 360;
+//                }
+//            }
+//            
+//            // close-near, close-far, nonclose-near, nonclose-far
+//            let aIsCloserAngle = Math.abs(aAngle - angleOfInterest) < Math.abs(bAngle - angleOfInterest);
+//            let aIsNearer = Math.abs(a.dist) < Math.abs(b.dist);
+//            
+//            if (aIsNearer && aIsCloserAngle) {
+//                return a;
+//            } else if (aIsNearer) {
+//                return a;
+//            } else if (aIsCloserAngle) {
+//                return a;
+//            }
+//            return b;
+            
+            if (a.dist < b.dist) {
+                return a;
+            }
+            return b;
+        });
+        
+        // Select the shortest distance point
+        this.countryDeselected();
+        this.countrySelected(closestPoint["Country Code"], closestPoint.id);
     }
 
     /**
