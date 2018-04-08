@@ -49,8 +49,8 @@ li span {
 
 #chart-container {
     width: 960px;
-    height: 600px;
-    background-color: #f8f8f8;
+    height: calc(600px+0px);
+    background-color: #eeeeee;
     margin: auto;
 }
 #chart-container > div,section {
@@ -62,7 +62,7 @@ li span {
     width: 600px;
     margin: 0;
     padding: 0;
-    background-color: #e8e8e8;
+/*    background-color: #e8e8e8;*/
 }
 #gdp-chart {
     height: 600px;
@@ -71,10 +71,10 @@ li span {
 #chart-info {
     margin: 0;
     padding: 0 1em;
-    background-color: #eeeeee;
+/*    background-color: #eeeeee;*/
     list-style:disc;
     width: 324px;
-    height: 600px;
+    height: 100%;
 }
 #year-slider {
     margin-top: 50px;

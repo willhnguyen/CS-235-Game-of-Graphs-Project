@@ -13,7 +13,7 @@
  * Set the desired data location and the id of the chart element to update.
  */
 let /** !String */ dataFilePath = './data/json/combined_data.json';
-let /** !String */ dataFilePath1 = './data/json/population_data.json';
+//let /** !String */ dataFilePath1 = './data/json/population_data.json';
 let chartElementID = 'gdp-chart';
 let chartElement = document.getElementById(chartElementID);
 
@@ -64,15 +64,16 @@ class GDPChart {
      * @author  William Nguyen
      */
     constructor(chartElementID) {
-        this.population;
+//        this.population;
         this.data = {};
-        this.populationData = {};
+//        this.populationData = {};
         this.chartElement = document.getElementById(chartElementID);
         this.chartjsObj = new Chart(this.chartElement, {});
 
         this.yearToDisplay = 2014;
         this.countrySelectedID = undefined;
         document.getElementById('chart-info').innerHTML = "<p>Please select a country's bubble to the left to see relevant data.</p>";
+        this.changeColorMode("ygb");
     }
 
     /**
@@ -205,7 +206,7 @@ class GDPChart {
                         },
                         scaleLabel: {
                             display: 'true',
-                            labelString: 'GDP'
+                            labelString: 'GDP (USD per Capita)'
                         },
                         ticks: {
                             autoSkip: false,
@@ -225,7 +226,7 @@ class GDPChart {
                         },
                         scaleLabel: {
                             display: 'true',
-                            labelString: 'CO2 Emissions'
+                            labelString: 'CO2 Emissions (Kt)'
                         },
                         ticks: {
                             autoSkip: false,
