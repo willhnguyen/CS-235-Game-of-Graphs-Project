@@ -205,7 +205,7 @@ class GDPChart {
                 // Boolean to enable panning
                 enabled: true,
 
-                // Panning directions. Remove the appropriate direction to disable 
+                // Panning directions. Remove the appropriate direction to disable
                 // Eg. 'y' would only allow panning in the y direction
                 mode: 'xy',
                 limits: {
@@ -224,7 +224,7 @@ class GDPChart {
                 enabled: true,
                 drag: true,
 
-                // Zooming directions. Remove the appropriate direction to disable 
+                // Zooming directions. Remove the appropriate direction to disable
                 // Eg. 'y' would only allow zooming in the y direction
                 mode: 'xy',
                 sensitivity: 10,
@@ -687,29 +687,29 @@ class GDPChart {
         var cerealYield = (d.datasets[t.datasetIndex].data[0].cerealYield);
         var waterAccess = (d.datasets[t.datasetIndex].data[0].waterAccess);
         text.push('<h1>'+d.datasets[t.datasetIndex].label+'</h1>');
-        text.push('<li>'+'GDP: ' + t.xLabel.toFixed(2) + '</li>');
-        text.push('<li>'+'CO2(kt): ' + t.yLabel.toFixed(2) +'</li>');
-        text.push('<li>'+'Population: ' + population +'</li>');
+        text.push('<li>'+'GDP: <span>' + t.xLabel.toFixed(2) + '</span></li>');
+        text.push('<li>'+'CO2(kt): <span>' + t.yLabel.toFixed(2) +'</span></li>');
+        text.push('<li>'+'Population: <span>' + population +'</span></li>');
         if(agriculturalLand!= undefined){
-          text.push('<li>'+'Agricultural land(sq. km): ' + agriculturalLand.toFixed(2) +'</li>');
+          text.push('<li>'+'Agricultural land(sq. km): <span>' + agriculturalLand.toFixed(2) +'</span></li>');
         }
         if(methaneEmmisions!= undefined){
-            text.push('<li>'+'Methane emissions: ' + methaneEmmisions.toFixed(2) +'</li>');
+            text.push('<li>'+'Methane emissions: <span>' + methaneEmmisions.toFixed(2) +'</span></li>');
         }
         if(otherGasEmmissions!= undefined){
-            text.push('<li>'+'Other greenhouse gas emissions: ' + otherGasEmmissions.toFixed(2) +'</li>');
+            text.push('<li>'+'Other greenhouse gas emissions: <span>' + otherGasEmmissions.toFixed(2) +'</span></li>');
         }
         if(oilUsage!= undefined){
-            text.push('<li>'+'Energy use(kg oil per capita): ' + oilUsage.toFixed(2) +'</li>');
+            text.push('<li>'+'Energy use(kg oil per capita): <span>' + oilUsage.toFixed(2) +'</span></li>');
         }
         if(forestArea!= undefined){
-          text.push('<li>'+'Forest Area(sq. km): ' + forestArea.toFixed(2) +'</li>');
+          text.push('<li>'+'Forest Area(sq. km): <span>' + forestArea.toFixed(2) +'</span></li>');
         }
         if(cerealYield!= undefined){
-          text.push('<li>'+'Cereal Yield(kg per hectare): ' + cerealYield.toFixed(2) +'</li>');
+          text.push('<li>'+'Cereal Yield(kg per hectare): <span>' + cerealYield.toFixed(2) +'</span></li>');
         }
         if(waterAccess!= undefined){
-          text.push('<li>'+'Water Accessibility(%): ' + waterAccess.toFixed(2) +'</li>');
+          text.push('<li>'+'Water Accessibility(%): <span>' + waterAccess.toFixed(2) +'</span></li>');
         }
 
         document.getElementById('chart-info').innerHTML = text.join("");
