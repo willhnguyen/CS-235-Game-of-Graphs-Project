@@ -29,7 +29,6 @@ let mouseFlags = {
 chartElement.addEventListener('mousedown', function (mouseFlags) {
     return function () {        
         chartElement.onmousemove = function() {
-            console.log("dragging");
             mouseFlags.dragFlag = true;
         }
     };
