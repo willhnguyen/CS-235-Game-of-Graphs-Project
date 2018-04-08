@@ -26,19 +26,32 @@ let mouseFlags = {
     mouseDownFlag: false,
     dragFlag: false
 }
-chartElement.addEventListener('mousedown', function (mouseFlags) {
-    return function () {        
-        chartElement.onmousemove = function() {
-            mouseFlags.dragFlag = true;
+document.addEventListener('mousedown', function (mouseFlags) {
+    return function () {
+        mouseFlags.mouseDownFlag = true;
+        document.onmousemove = function() {
+            if (mouseFlags.mouseDownFlag)
+                mouseFlags.dragFlag = true;
         }
     };
 }(mouseFlags));
-//document.addEventListener('mouseup', function (moveVar) {
-//    return function () {
-//        document.onmousemove = null;
-//        moveVar = false;
-//    };
-//}(dragFlag));
+document.addEventListener('mouseup', function (mouseFlags) {
+    return function (event) {
+        let mouseX = event.clientX;
+        let mouseY = event.clientY;
+        
+        let rect = chartElement.getBoundingClientRect();
+        
+        // Check if in rect
+        let inRect = (mouseY < rect.top + rect.height && mouseY > rect.top) && (mouseX < rect.left + rect.width && mouseX > rect.left);
+        if (!inRect) {
+            console.log("drag resetting");
+            document.onmousemove = null;
+            mouseFlags.dragFlag = false;
+            mouseFlags.mouseDownFlag = false;
+        }
+    };
+}(mouseFlags));
 
 /**
  * The main class to fetch data and update the bubble chart visualization.
@@ -539,11 +552,13 @@ class GDPChart {
                     // Selected chart background
                     that.countryDeselected();
                 }
-            } else {
-                // Reset drag flag
-                aMouseFlagsObj.dragFlag = false;
-                chartElement.onmousemove = null;
             }
+            
+            // Reset drag flag
+            aMouseFlagsObj.dragFlag = false;
+            aMouseFlagsObj.mouseDownFlag = false;
+            chartElement.onmousemove = null;
+
         };
     }
 
