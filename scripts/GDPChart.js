@@ -232,6 +232,11 @@ class GDPChart {
 				}
             }
         }
+        
+        document.onkeydown = function(evt) {
+            evt = evt || window.event;
+            gdpChart.checkKeyInput(evt);
+          };
 
         this.chartjsObj = new Chart(this.chartElement, {
             type: 'bubble',
@@ -241,6 +246,21 @@ class GDPChart {
             options: chartOptions,
         })
     }
+    
+    /**
+     * Check for keyboard input
+     *
+     *ESC Key - Reloads the chart
+     *
+     * @author Jisha Pillai
+     */
+    checkKeyInput(event){
+        if (event.keyCode == 27) {
+             //alert('Esc key pressed.');
+             gdpChart.chartjsObj.resetZoom();  
+           }
+    }
+
 
 
      /**
