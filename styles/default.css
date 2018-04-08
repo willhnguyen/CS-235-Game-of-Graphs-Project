@@ -79,6 +79,10 @@ li span {
 #chart-info {
     width: 100%;
 }
+#chart-info li,
+#chart-info p{
+    font-size: 14px;
+}
 #year-slider {
     margin-top: 50px;
 }
@@ -100,10 +104,13 @@ li span {
     outline: none;
 }
 #reset_zoom:hover {
-    background-color: red;
+    background-color: #81D4FA;
+    border-color: #4FC3F7;
 }
 #reset_zoom:active {
-    background-color: orange;
+    background-color: #03A9F4;
+    border-color: #0288D1;
+    color: #fff;
 }
 #color-picker {
     width: 70%;

@@ -277,6 +277,7 @@ class GDPChart {
             gdpChart.checkKeyInput(evt);
           };
 
+        delete this['chartjsObj'];
         this.chartjsObj = new Chart(this.chartElement, {
             type: 'bubble',
             data: {
@@ -297,7 +298,7 @@ class GDPChart {
         switch(event.keyCode) {
             case 27:
 //                this.chartjsObj.resetZoom();
-                this.generateChart();
+                this.resetZoom();
                 break;
             case 37: // Left Arrow Key
             case 65:
@@ -1090,6 +1091,32 @@ class GDPChart {
      * @param {Array} range The range zoom into provided as a 2-tuple. (e.g. [0, 100])
      */
     zoomSelection(axis, range) {
+    }
+    
+    resetZoom() {
+//        this.chartjsObj.options.scales.xAxes[0].ticks.min = 100000;
+        this.chartjsObj.options.scales.xAxes = [
+            {
+                position: 'bottom',
+                gridLines: {
+                    zeroLineColor: 'rgba(0,0,0,1)'
+                },
+                scaleLabel: {
+                    display: 'true',
+                    labelString: 'GDP (USD per Capita)'
+                },
+                ticks: {
+                    autoSkip: false,
+                    min: 50,
+                    max: 2e5,
+                    callback: this.defineLogTickLabels
+                },
+                afterBuildTicks: this.defineLogTicks(50, 2e5),
+                type: 'logarithmic'
+            }
+        ];
+        
+        this.updateChart();
     }
 
 }
