@@ -529,6 +529,8 @@ class GDPChart {
 
     /**
      * Callback for when the chart registers a click event.
+     * 
+     * @author William Nguyen
      */
     onClickEvent(context) {
         let that = context;
@@ -566,6 +568,8 @@ class GDPChart {
      * Callback for when a bubble has been selected.
      *
      * @param {string} countryID The 3-letter id of a country
+     *
+     * @author William Nguyen
      */
     countrySelected(countryID, datasetID) {
         
@@ -594,6 +598,8 @@ class GDPChart {
 
     /**
      * Callback for when a bubble has been deselected.
+     *
+     * @author William Nguyen
      */
     countryDeselected() {
         // Reset countrySelected state and show general chart info
@@ -620,15 +626,15 @@ class GDPChart {
         
     }
 
-    /**
-     * Callback for when a bubble is hovered-over
-     *
-     * @param {string} countryID The 3-letter id of a country
-     */
-    countryHovered(countryID) {
-        // Update information displayed in the sidebar
-        //showCountryInfo(countryID);
-    }
+//    /**
+//     * Callback for when a bubble is hovered-over
+//     *
+//     * @param {string} countryID The 3-letter id of a country
+//     */
+//    countryHovered(countryID) {
+//        // Update information displayed in the sidebar
+//        //showCountryInfo(countryID);
+//    }
 
     /**
      * Provides data on a particular data unit of a country.
