@@ -13,41 +13,46 @@
 
         <p>Does GDP affect a nation's contribution to climate change? Let's find out through a visualization! Play around with the visualization below. If you're stuck, read on to understand some of the interesting things we found.</p>
 
-        <!-- Dropdown for Year (Example) -->
-        <label>Year Picker:</label> <select name="Year Picker" id="year-picker" onchange="yearPickerUpdated(this)">
-        </select>
-        <label>Color Mode:</label> <select name="Color Picker" id="color-picker" onchange="gdpChart.changeColorMode(this.options[this.selectedIndex].value)">
-            <option value="default" selected>Red-Blue</option>
-            <option value="primaries">Primary</option>
-            <option value="primariesHSL">PrimaryHSL</option>
-            <option value="ygb">Yellow-Green-Blue</option>
-            <option value="white2red">White-Red</option>
-            <option value="white2blue">White-Blue</option>
-            <option value="heat">Heat</option>
-            <option value="bw">Black-White</option>
-        </select>
-
-        <button id="reset_zoom" onclick = "gdpChart.generateChart()">
-            Reset zoom
-        </button>
-
         <!-- ChartJS Visualization -->
         <div id="chart-container">
             <div id="gdp-chart-container">
                 <canvas id="gdp-chart">
                 </canvas>
             </div>
-            <section id="chart-info">
-                <h1>Country Info</h1>
-
-                <p></p>
-            </section>
-            
-            <!-- Slider for Year -->
-            <div style="position: relative;width: 500px;padding:0 10px 0 80px">
-                <div id="year-slider" style="margin-bottom: 4em;">
-                    <footer style="position:absolute; bottom: 2em; left:2.5em; text-align: center; width: 100%">Year</footer>
+            <div id="right-sidebar">
+                <div style="position:relative;margin-top:1em">
+                   
+                    <!-- Reset Zoom Button -->
+                    <button id="reset_zoom" onclick="gdpChart.generateChart()">
+                        Reset zoom
+                    </button>
+                    <br>
+                    <!-- Slider for Year -->
+                    <div style="position:relative;padding:0">
+                        <div id="year-slider" style="margin-bottom: 2.5em;">
+                            <footer style="position:absolute; bottom: -2em; left:0em; text-align: center; width: 100%">Year</footer>
+                        </div>
+                    </div>
+                    <!-- Dropdown for Color -->
+                    <label>Color Mode:</label> <select name="Color Picker" id="color-picker" onchange="gdpChart.changeColorMode(this.options[this.selectedIndex].value)">
+                        <option value="default">Red-Blue</option>
+                        <option value="primaries">Primary</option>
+                        <option value="primariesHSL">PrimaryHSL</option>
+                        <option value="ygb" selected>Yellow-Green-Blue</option>
+                        <option value="white2red">White-Red</option>
+                        <option value="white2blue">White-Blue</option>
+                        <option value="heat">Heat</option>
+                        <option value="bw">Black-White</option>
+                    </select>
                 </div>
+                
+                <hr>
+                
+                <section id="chart-info">
+                    <h1>Country Info</h1>
+
+                    <p></p>
+                </section>
             </div>
         </div>
 

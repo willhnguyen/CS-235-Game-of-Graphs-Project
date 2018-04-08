@@ -50,15 +50,16 @@ const gdpChart = new GDPChart('gdp-chart');
 gdpChart.getData();
 //gdpChart.getPopulationData();
 
-// Populate the year select dropdown list based on years available.
-let yearPicker = document.getElementById('year-picker');
-for (let i = 1990; i <= 2014; ++i) {
-    yearPicker.innerHTML = yearPicker.innerHTML + "<option value='" + i.toString() + "'>" + i.toString() + "</option>";
-}
-
-// Select the most recent year
-yearPicker.selectedIndex = yearPicker.length - 1;
+//// Populate the year select dropdown list based on years available.
+//let yearPicker = document.getElementById('year-picker');
+//for (let i = 1990; i <= 2014; ++i) {
+//    yearPicker.innerHTML = yearPicker.innerHTML + "<option value='" + i.toString() + "'>" + i.toString() + "</option>";
+//}
+//
+//// Select the most recent year
+//yearPicker.selectedIndex = yearPicker.length - 1;
 
 // Create custom year slider
 let yearSlider = new Slider('year-slider', 1990, 2014, 1, [1990, 1995, 2000, 2005, 2010, 2014], function(i) {return gdpChart.updateChartByYear(i);});
+//let yearSlider = new Slider('year-slider', 1990, 2014, 1, [1990, 2000, 2010, 2014], function(i) {return gdpChart.updateChartByYear(i);});
 yearSlider.selectedVal(2014);

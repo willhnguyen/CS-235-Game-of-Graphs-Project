@@ -68,13 +68,16 @@ li span {
     height: 600px;
     /* background-color: red; */
 }
-#chart-info {
+#right-sidebar {
     margin: 0;
-    padding: 0 1em;
-/*    background-color: #eeeeee;*/
+    padding: 1em 1em;
+/*    background-color: #fff;*/
     list-style:disc;
     width: 324px;
-    height: 100%;
+    height: calc(100%-2em);
+}
+#chart-info {
+    width: 100%;
 }
 #year-slider {
     margin-top: 50px;
@@ -86,4 +89,23 @@ li span {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+#reset_zoom {
+    width: 100%;
+    margin: 0.5em;
+    background-color: #f8f8f8;
+    border: solid 2px black;
+    border-radius: 1em;
+    font-size: 1em;
+    outline: none;
+}
+#reset_zoom:hover {
+    background-color: red;
+}
+#reset_zoom:active {
+    background-color: orange;
+}
+#color-picker {
+    width: 70%;
+    
 }
