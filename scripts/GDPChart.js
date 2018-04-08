@@ -15,7 +15,31 @@
 let /** !String */ dataFilePath = './data/json/combined_data.json';
 let /** !String */ dataFilePath1 = './data/json/population_data.json';
 let chartElementID = 'gdp-chart';
+let chartElement = document.getElementById(chartElementID);
 
+/**
+ * Mouse events to detect mouse drags.
+ * 
+ * Needed to fix a bug in zooming where the bubbles are deselected upon mouseup.
+ */
+let mouseFlags = {
+    mouseDownFlag: false,
+    dragFlag: false
+}
+chartElement.addEventListener('mousedown', function (mouseFlags) {
+    return function () {        
+        chartElement.onmousemove = function() {
+            console.log("dragging");
+            mouseFlags.dragFlag = true;
+        }
+    };
+}(mouseFlags));
+//document.addEventListener('mouseup', function (moveVar) {
+//    return function () {
+//        document.onmousemove = null;
+//        moveVar = false;
+//    };
+//}(dragFlag));
 
 /**
  * The main class to fetch data and update the bubble chart visualization.
@@ -36,7 +60,7 @@ class GDPChart {
         this.chartjsObj = new Chart(this.chartElement, {});
 
         this.yearToDisplay = 2014;
-        this.countrySelected = -1;
+        this.countrySelectedID = undefined;
     }
 
     /**
@@ -113,6 +137,8 @@ class GDPChart {
             return {
                 label: val["Country Name"],
                 backgroundColor: this.getCountryColor(val["Country Code"], this.yearToDisplay),
+                borderColor: 'rgba(0, 0, 0, 0)',
+                borderWidth: 0,
                 data: [
                     {
                         x: val["GDP Data"][this.yearToDisplay],
@@ -130,27 +156,27 @@ class GDPChart {
                 text: 'Climate Change Data Visualization',
                 display: 'true'
             },
-            onHover: this.onHoverEvent(),
-            onClick: this.onClickEvent(),
+            onHover: this.onHoverEvent(this),
+            onClick: this.onClickEvent(this),
             tooltips: {
-                       position: 'nearest',
-                       intersect: true,
-                       //backgroundColor: 'rgba(0, 0, 255, 0)',
-						           titleFontColor: 'white',
-						           bodyFontColor: 'white',
-						           borderColor: 'rgba(0,0,0,1)',
-						           borderWidth: 1.2,
-                       callbacks: {
-                                  beforeLabel : this.getChartInfo(),
-                                  label: this.updateTooltipLabel
-                       }
+                position: 'nearest',
+                intersect: true,
+                //backgroundColor: 'rgba(0, 0, 255, 0)',
+                titleFontColor: 'white',
+                bodyFontColor: 'white',
+                borderColor: 'rgba(0,0,0,1)',
+                borderWidth: 1.2,
+                callbacks: {
+                    beforeLabel : this.getChartInfo(),
+                    label: this.updateTooltipLabel
+                }
             },
             elements: {
-				          point: {
-					               //hoverBackgroundColor: 'transparent',
-					               hoverBorderColor: 'rgba(125,200,220, 1)',
-					               hoverBorderWidth: 3
-				}
+                point: {
+                    //hoverBackgroundColor: 'transparent',
+                    hoverBorderColor: 'rgba(125,200,220, 1)',
+                    hoverBorderWidth: 3
+                }
 			},
             legend: {
                 display: false,
@@ -382,9 +408,16 @@ class GDPChart {
             return;
         }
         this.countryInfoShown = countryID;
+        let chartInfoDiv = document.getElementById('chart-info');
+        
+        // If there is no countryID given, then set the view to a default help text
+        if (countryID === undefined) {
+            // Update information to be displayed
+            chartInfoDiv.innerHTML = "<p>Please select a country's bubble to the left to see relevant data.</p>";
+        }
         
         // Define data to display
-        let dataToDisplay = [
+        const dataToDisplay = [
             {
                 label: 'GDP',
                 key: 'GDP Data'
@@ -419,7 +452,11 @@ class GDPChart {
         
         // Generate the HTML to display
         let HTMLarray = [];
-        HTMLarray.push('<h1>'+this.data.data[this.data.ids[countryID]]["Country Name"]+'</h1>');
+        if (this.data.data[this.data.ids[countryID]] !== undefined) {
+            HTMLarray.push('<h1>'+this.data.data[this.data.ids[countryID]]["Country Name"]+'</h1>');
+        } else {
+            return ;
+        }
         
         for (let dataInfo of dataToDisplay) {
             let foundInfo = this.getCountryInfo(countryID, this.yearToDisplay, dataInfo.key);
@@ -429,7 +466,6 @@ class GDPChart {
         }
         
         // Update information to be displayed
-        let chartInfoDiv = document.getElementById('chart-info');
         chartInfoDiv.innerHTML = HTMLarray.join("");
     }
 
@@ -456,8 +492,8 @@ class GDPChart {
     /**
      * Callback for when the chart registers a hover event.
      */
-    onHoverEvent() {
-        //let that = this;
+    onHoverEvent(context) {
+        let that = context;
 
         /**
          * Closure to provide context to GDPChart object as variable 'that'
@@ -474,6 +510,7 @@ class GDPChart {
                 // console.log(that.chartjsObj.data.datasets[elementID]);
             } else {
                 // Chart background hovered
+                that.showCountryInfo(that.countrySelectedID);
             }
         }
     }
@@ -481,8 +518,9 @@ class GDPChart {
     /**
      * Callback for when the chart registers a click event.
      */
-    onClickEvent() {
-        let that = this;
+    onClickEvent(context) {
+        let that = context;
+        let aMouseFlagsObj = mouseFlags;
 
         /**
          * Closure to provide context to GDPChart object as variable 'that'
@@ -490,17 +528,22 @@ class GDPChart {
          * @param {Object} chartEl A list of objects clicked with respect to Chartjs
          */
         return (_, chartEl)=>{
+            if (!(aMouseFlagsObj.dragFlag)) {
+                if (chartEl.length > 0) {
+                    // An element has been clicked.
+                    let elementID = chartEl[0]._datasetIndex;
 
-            if (chartEl.length > 0) {
-                // An element has been clicked.
-                let elementID = chartEl[0]._datasetIndex;
-                console.log(elementID);
-
-                // // Example of using it to extract dataset information
-                // console.log("CLICK!", chartEl);
-                // console.log(that.chartjsObj.data.datasets[elementID]);
+                    // Set the selected element
+                    that.countryDeselected();
+                    that.countrySelected(that.chartjsObj.data.datasets[elementID].data[0]["Country Code"], elementID);
+                } else {
+                    // Selected chart background
+                    that.countryDeselected();
+                }
             } else {
-                // Selected chart background
+                // Reset drag flag
+                aMouseFlagsObj.dragFlag = false;
+                chartElement.onmousemove = null;
             }
         };
     }
@@ -510,11 +553,29 @@ class GDPChart {
      *
      * @param {string} countryID The 3-letter id of a country
      */
-    countrySelected(countryID) {
+    countrySelected(countryID, datasetID) {
+        
+        
         // Save selection state and update information displayed in the sidebar
-        console.log(countryID);
-        this.countrySelected = countryID;
-        //showCountryInfo(countryID);
+        this.countrySelectedID = countryID;
+        this.showCountryInfo(countryID);
+        
+        // Change bubble's stroke size
+        if (datasetID !== undefined) {
+            let countryID = this.chartjsObj.data.datasets[datasetID].data[0]["Country Code"];
+            let bubble = this.chartjsObj.data.datasets[datasetID];
+            
+            // Save the selected ID
+            this.countrySelectedDatasetID = datasetID;
+            
+            // Update bubble style
+            // this.chartjsObj.data.datasets[datasetID].borderColor = 'rgba(0, 0, 0, 1)';
+            // this.chartjsObj.data.datasets[datasetID].borderWidth = 3;
+            this.chartjsObj.data.datasets[datasetID].backgroundColor = 'rgba(255, 0, 0, 0.75)';
+            
+            // Reflect changes to chart
+            this.updateChart();
+        }
     }
 
     /**
@@ -522,8 +583,27 @@ class GDPChart {
      */
     countryDeselected() {
         // Reset countrySelected state and show general chart info
-        this.countrySelected = -1;
-        showDefaultInfo();
+        this.countrySelectedID = -1;
+        this.showCountryInfo(undefined);
+        
+        // Change bubble's stroke size
+        if (this.countrySelectedDatasetID !== undefined) {
+            let datasetID = this.countrySelectedDatasetID;
+            let countryID = this.chartjsObj.data.datasets[datasetID].data[0]["Country Code"];
+            let bubble = this.chartjsObj.data.datasets[datasetID];
+            
+            // Reset the selected ID
+            this.countrySelectedDatasetID = undefined;
+            
+            // Update bubble style
+            // bubble.borderColor = 'rgba(0, 0, 0, 0)';
+            // bubble.borderWidth = 0;
+            bubble.backgroundColor = this.getCountryColor(countryID, this.yearToDisplay);
+            
+            // Reflect changes to chart
+            this.updateChart();
+        }
+        
     }
 
     /**
@@ -623,6 +703,11 @@ class GDPChart {
         let value = false;
         if (this.data.data[countryIndex][key] !== undefined) {
             value = this.data.data[countryIndex][key][year];
+        }
+        
+        // If the country is selected, then the color is just red
+        if (this.countrySelectedID === countryID) {
+            return 'rgba(255, 0, 0, 1)';
         }
 
         // Interpolate color value based on the data value
