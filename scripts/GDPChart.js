@@ -143,12 +143,28 @@ class GDPChart {
             onHover: this.onHoverEvent(),
             onClick: this.onClickEvent(),
             tooltips: {
-                mode: 'point',
-                callbacks: {
-                    beforeLabel : this.getChartInfo,
-                    label: this.updateTooltipLabel
-                }
+                       //mode: 'nearest',
+                       position: 'nearest',
+                       intersect: false,
+                       //backgroundColor: 'rgba(0, 0, 255, 0)',
+						           titleFontColor: 'white',
+						           bodyFontColor: 'white',
+						           borderColor: 'rgba(0,0,0,1)',
+						           borderWidth: 1.2,
+                       callbacks: {
+                                  beforeLabel : this.getChartInfo,
+                                  label: this.updateTooltipLabel
+                       }
             },
+
+            elements: {
+				          point: {
+					               //hoverBackgroundColor: 'transparent',
+					               hoverBorderColor: 'rgba(125,200,220, 1)',
+					               hoverBorderWidth: 3
+				}
+			},
+
            legend: {
                 display: false,
             },
@@ -372,6 +388,7 @@ class GDPChart {
      * @param {object} t A single data point in the chart object's dataset
      * @param {object} d The entire dataset stored in the chart object
      * @author  Jisha Pillai
+     * @author  Raksha Sunil (editor)
      */
     updateTooltipLabel(t, d){
         // Show the information of identified country
@@ -673,7 +690,7 @@ class GDPChart {
      * @param {object} t A single data point in the chart object's dataset
      * @param {object} d The entire dataset stored in the chart object
      * @author  Jisha Pillai
-     * @author  Raksha Sunil (edited)
+     * @author  Raksha Sunil (editor)
      */
     getChartInfo(t, d){
         var text = [];
