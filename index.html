@@ -17,12 +17,14 @@
         <label>Year Picker:</label> <select name="Year Picker" id="year-picker" onchange="yearPickerUpdated(this)">
         </select>
         <label>Color Mode:</label> <select name="Color Picker" id="color-picker" onchange="gdpChart.changeColorMode(this.options[this.selectedIndex].value)">
-            <option value="default">Default</option>
+            <option value="default" selected>Red-Blue</option>
             <option value="primaries">Primary</option>
             <option value="primariesHSL">PrimaryHSL</option>
             <option value="ygb">Yellow-Green-Blue</option>
             <option value="white2red">White-Red</option>
             <option value="white2blue">White-Blue</option>
+            <option value="heat">Heat</option>
+            <option value="bw">Black-White</option>
         </select>
 
         <button id="reset_zoom" onclick = "gdpChart.chartjsObj.resetZoom()">
@@ -49,7 +51,7 @@
             <div id="year-slider" style="margin-bottom: 4em;">
                 <footer style="position:absolute; top: 1em; text-align: center; width: 100%">Year</footer>
             </div>
-        <div>
+        </div>
 
         <h2>Analysis</h2>
         <p>{{ Information to be added here }}</p>

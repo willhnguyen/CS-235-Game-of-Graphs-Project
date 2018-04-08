@@ -1,4 +1,32 @@
+/**
+ * Slider class for creating a simple slider.
+ *
+ * This slider.js file provides the class and methods necessary
+ * to display a slider with an custom callback function on a marker
+ * position change.
+ * 
+ * @link   http://github.com/willhnguyen/CS-235-Game-of-Graphs-Project/
+ *
+ * @author Jisha Pillai (JP), Raksha Sunil (RS), William Nguyen (WN)
+ */
+
+ /**
+  * Slider class to generate a HTML slider.
+  * 
+  * @author William Nguyen
+  */
 class Slider {
+
+    /**
+     * Creates a slider with the following properties.
+     * 
+     * @param {string} elementId The name of the element to append slider to
+     * @param {number} minVal Min value of the slider
+     * @param {number} maxVal Max value of the slider
+     * @param {number} stepVal The increment amount for each tick from min to <= max value
+     * @param {[number]} labels The number labels which should show on the slider
+     * @param {function (number)} callback Function to invoke when marker has been changed
+     */
     constructor(elementId, minVal, maxVal, stepVal, labels, callback) {
         this.elementId = elementId;
         this.element = document.getElementById(elementId);
@@ -25,6 +53,9 @@ class Slider {
         document.addEventListener('mouseup', this.mouseUpListener());
     }
     
+    /**
+     * Draws the tick marks of the slider.
+     */
     drawTicks() {
         // Populate Slider with Ticks at Calculated Distances
         this.slide = document.getElementById(`${this.elementId}-slide`);
@@ -49,18 +80,39 @@ class Slider {
         }
     }
     
+    /**
+     * Listener for a mouse down event.
+     * 
+     * On mouse down, the listener begins registering a drag event (via a flag). In particular,
+     * the mouse down changes to show marker is being dragged.
+     */
     mouseDownListener() {
         const that = this;
         return function(event) {
             that.markerDragFlag = true;
+            that.marker.classList.add('active');
         };
     }
+
+    /**
+     * Listener for a mouse up event.
+     * 
+     * On mouse up, the listener stops registering mouse drags (via a flag). In particular,
+     * the mouse up changes to show marker has stopped being dragged.
+     */
     mouseUpListener() {
         const that = this;
         return function(event) {
             that.markerDragFlag = false;
+            that.marker.classList.remove('active');
         };
     }
+    /**
+     * Listener for mouse drag event.
+     * 
+     * When mouse drag is registered, a callback is invoked to notify change in slider value.
+     * @param {function (int)} callback A function that uses the slider value
+     */
     mouseMoveListener(callback) {
         const that = this;
         return function(event) {
@@ -88,7 +140,15 @@ class Slider {
         };
     }
     
-    // Source: https://stackoverflow.com/questions/14275304/
+    /**
+     * Obtain the desired style attribute value of an element.
+     * 
+     * Source: https://stackoverflow.com/questions/14275304/
+     * 
+     * @param {object} e The DOM element which we want to obtain the style attribute value from
+     * @param {string} styleName The name of the style attribute we want to obtain
+     * @return {*} The value of the desired style attribute
+     */
     getStyle(e, styleName) {
         var styleValue = "";
         if(document.defaultView && document.defaultView.getComputedStyle) {
@@ -103,6 +163,13 @@ class Slider {
         return styleValue;
     }
     
+    /**
+     * Sets the selected value and updates the slider marker's position.
+     * 
+     * Note: The value will be forced within the bounds of the slider's min and max values.
+     * 
+     * @param {number} val The desired value to set the slider to
+     */
     selectedVal(val) {        
         // Calculate index i
         let i = Math.round(val - this.minVal / this.stepVal);
@@ -117,6 +184,13 @@ class Slider {
         this.setStyle(this.marker, "left", `${left_position}px`);
     }
     
+    /**
+     * Sets a style attribute of an element.
+     * 
+     * @param {object} e The DOM element whose style should be updated
+     * @param {string} styleName The style attribute to update
+     * @param {*} value The value to change the style attribute to
+     */
     setStyle(e, styleName, value) {
         e.style[styleName] = value;
     }
