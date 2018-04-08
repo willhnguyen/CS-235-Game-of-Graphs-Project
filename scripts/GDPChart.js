@@ -106,11 +106,11 @@ class GDPChart {
      *
      * @author  Jisha Pillai
      * @author  William Nguyen (editor)
+     * @author  Raksha Sunil (editor)
      */
     generateChart() {
         // Set up the dataset to be passed to chartjs
         let chartData = this.data.data.map((val, idx, arr)=>{
-//            console.log(this.getCountryPopulation(val["Country Code"], this.yearToDisplay));
             return {
                 label: val["Country Name"],
                 backgroundColor: this.getCountryColor(val["Country Code"], this.yearToDisplay),
@@ -119,14 +119,21 @@ class GDPChart {
                         x: val["GDP Data"][this.yearToDisplay],
                         y: val["CO2 Data"][this.yearToDisplay],
                         r: Math.log(this.getCountryPopulation(val["Country Code"], this.yearToDisplay))/2,
-                        population: this.getCountryPopulation(val["Country Code"], this.yearToDisplay)
-
-
+                        population: this.getCountryPopulation(val["Country Code"], this.yearToDisplay),
+                        agriculturalLand: val["Agricultural land (sq. km)"][this.yearToDisplay],
+                        methaneEmmisions: val["Methane emissions (kt of CO2 equivalent)"][this.yearToDisplay],
+                        otherGasEmmissions: val["Other greenhouse gas emissions (% change from 1990)"][this.yearToDisplay],
+                        oilUsage: val["Energy use (kg of oil equivalent per capita)"][this.yearToDisplay],
+                        powerConsumption: val["Electric power consumption (kWh per capita)"][this.yearToDisplay],
+                        forestArea: val["Forest area (sq. km)"][this.yearToDisplay],
+                        cerealYield: val["Cereal yield (kg per hectare)"][this.yearToDisplay],
+                        waterAccess: val["Improved water source (% of population with access)"][this.yearToDisplay]
                     }
                  ]
              }
 
         });
+
 
         let chartOptions = {
             title: {
@@ -138,11 +145,12 @@ class GDPChart {
             tooltips: {
                 mode: 'point',
                 callbacks: {
+                    beforeLabel : this.getChartInfo,
                     label: this.updateTooltipLabel
                 }
             },
-            legend: {
-                display: false
+           legend: {
+                display: false,
             },
             scaleBeginAtZero: 'false',
             responsive: 'true',
@@ -192,8 +200,43 @@ class GDPChart {
                         type: 'logarithmic'
                     }
                 ]
+            },
+            pan: {
+                // Boolean to enable panning
+                enabled: true,
+
+                // Panning directions. Remove the appropriate direction to disable 
+                // Eg. 'y' would only allow panning in the y direction
+                mode: 'xy',
+                limits: {
+				   xmin: 1e-4,
+				   ymin: -50,
+				   ymax: 10
+				},
+				xScale0: {
+						max: 1e4
+					}
+            },
+
+            // Container for zoom options
+            zoom: {
+                // Boolean to enable zooming
+                enabled: true,
+                drag: true,
+
+                // Zooming directions. Remove the appropriate direction to disable 
+                // Eg. 'y' would only allow zooming in the y direction
+                mode: 'xy',
+                sensitivity: 10,
+				limits: {
+				  max: 10,
+				  min: 0.5
+				}
             }
-        }
+          }
+
+
+
 
 
         this.chartjsObj = new Chart(this.chartElement, {
@@ -201,11 +244,12 @@ class GDPChart {
             data: {
                 datasets: chartData
             },
-            options: chartOptions
+            options: chartOptions,
         })
     }
-    
-    /**
+
+
+     /**
      * Outputs a filtered list of tick values for logarithmic scale.
      *
      * This custom function filters out unnecessary tick labels for the logarithmic scale. The
@@ -228,7 +272,7 @@ class GDPChart {
         // Keep tick label if the tick is the beginning or last tick value
         else if (index === ticks.length - 1 || index === 0) {
             return tick.toLocaleString();
-        } 
+        }
         // Remove labels for ticks beginning with 1 or 5
         else if (mostSigDigit !== "5" && mostSigDigit !== "1") {
             return "";
@@ -236,13 +280,13 @@ class GDPChart {
 
         return tick.toLocaleString();
     }
-    
+
     /**
      * Returns a closure that calculates the ticks marks to show on the chart.
      *
      * Although Chart.js already determines tick marks, the tick marks moves when the chart updates.
      * This custom closure sets the tick marks to a defined set of ticks and the ticks don't move anymore.
-     * 
+     *
      * @param {number} minTick The value of the maxTick to use
      * @param {number} maxTick The value of the minTick to use
      * @author William Nguyen
@@ -269,7 +313,8 @@ class GDPChart {
             return;
         }
     }
-    
+
+
     /**
      * Update the visualization chart
      *
@@ -281,6 +326,8 @@ class GDPChart {
     updateChart() {
         this.chartjsObj.update();
     }
+
+
 
     /**
      * Update the visualization chart by a selected year.
@@ -312,12 +359,12 @@ class GDPChart {
      *
      * @param {string} countryID The 3-letter id of a country
      */
-    showCountryInfo(countryID) {
-        let chartInfoDiv = document.getElementById('chart-info');
-
-        // Update information to be displayed
-        chartInfoDiv.innerHTML = chartInfoDiv.innerHTML;
-    }
+//    showCountryInfo(countryID) {
+//        let chartInfoDiv = document.getElementById('chart-info');
+//
+//        // Update information to be displayed
+//        chartInfoDiv.innerHTML = chartInfoDiv.innerHTML;
+//    }
 
     /**
      * Bubble-hover tooltip callback to populate its text.
@@ -328,14 +375,11 @@ class GDPChart {
      */
     updateTooltipLabel(t, d){
         // Show the information of identified country
-        // showCountryInfo(0);
-        console.log(d.datasets[t.datasetIndex]);
+        //console.log(d.datasets[t.datasetIndex]);
 
         var population = d.datasets[t.datasetIndex].data[0].population;
 
-        console.log(population);
-
-        return d.datasets[t.datasetIndex].label + ': (GDP: ' + t.xLabel.toFixed(5) + ', CO2: ' + t.yLabel.toFixed(5) + ', Population: ' + population + ')';
+        return (d.datasets[t.datasetIndex].label  +' /n GDP: ' + t.xLabel.toFixed(5) + ', /n CO2: ' + t.yLabel.toFixed(5) + ', /n Population: ' + population).split("/n");
 
     };
 
@@ -397,8 +441,9 @@ class GDPChart {
      */
     countrySelected(countryID) {
         // Save selection state and update information displayed in the sidebar
+        console.log(countryID);
         this.countrySelected = countryID;
-        showCountryInfo(countryID);
+        //showCountryInfo(countryID);
     }
 
     /**
@@ -417,7 +462,7 @@ class GDPChart {
      */
     countryHovered(countryID) {
         // Update information displayed in the sidebar
-        showCountryInfo(countryID);
+        //showCountryInfo(countryID);
     }
 
     /**
@@ -540,20 +585,6 @@ class GDPChart {
      * @author  Jisha Pillai
      */
     getCountryPopulation(countryID, year) {
-//        var population = 0;
-//        this.populationData.data.map((val, idx, arr)=>{
-//            if(this.populationData.data[idx]["Country Code"] === countryID){
-//                console.log(this.populationData.data[idx]["Country Code"]);
-//                console.log(this.populationData.data[idx][year]);
-//                population = this.populationData.data[idx][year]
-//
-//
-//            }
-//
-//
-//
-//        })
-//       return population;
         let countryIndex = this.populationData.ids[countryID];
         if (this.populationData.data[countryIndex] !== undefined) {
             return this.populationData.data[countryIndex][year];
@@ -636,6 +667,58 @@ class GDPChart {
         // Return the color gradient
         return allGradients[this.colorMode];
     }
+    /**
+     * Populate Country info on the right side of the chart on bubble mouse-hover.
+     *
+     * @param {object} t A single data point in the chart object's dataset
+     * @param {object} d The entire dataset stored in the chart object
+     * @author  Jisha Pillai
+     * @author  Raksha Sunil (edited)
+     */
+    getChartInfo(t, d){
+        var text = [];
+        var population = d.datasets[t.datasetIndex].data[0].population;
+        var agriculturalLand = d.datasets[t.datasetIndex].data[0].agriculturalLand;
+        var methaneEmmisions = (d.datasets[t.datasetIndex].data[0].methaneEmmisions);
+        var otherGasEmmissions = (d.datasets[t.datasetIndex].data[0].otherGasEmmissions);
+        var oilUsage = (d.datasets[t.datasetIndex].data[0].oilUsage);
+        var powerConsumption = (d.datasets[t.datasetIndex].data[0].powerConsumption);
+        var forestArea = (d.datasets[t.datasetIndex].data[0].forestArea);
+        var cerealYield = (d.datasets[t.datasetIndex].data[0].cerealYield);
+        var waterAccess = (d.datasets[t.datasetIndex].data[0].waterAccess);
+        text.push('<h1>'+d.datasets[t.datasetIndex].label+'</h1>');
+        text.push('<li>'+'GDP: ' + t.xLabel.toFixed(2) + '</li>');
+        text.push('<li>'+'CO2(kt): ' + t.yLabel.toFixed(2) +'</li>');
+        text.push('<li>'+'Population: ' + population +'</li>');
+        if(agriculturalLand!= undefined){
+          text.push('<li>'+'Agricultural land(sq. km): ' + agriculturalLand.toFixed(2) +'</li>');
+        }
+        if(methaneEmmisions!= undefined){
+            text.push('<li>'+'Methane emissions: ' + methaneEmmisions.toFixed(2) +'</li>');
+        }
+        if(otherGasEmmissions!= undefined){
+            text.push('<li>'+'Other greenhouse gas emissions: ' + otherGasEmmissions.toFixed(2) +'</li>');
+        }
+        if(oilUsage!= undefined){
+            text.push('<li>'+'Energy use(kg oil per capita): ' + oilUsage.toFixed(2) +'</li>');
+        }
+        if(forestArea!= undefined){
+          text.push('<li>'+'Forest Area(sq. km): ' + forestArea.toFixed(2) +'</li>');
+        }
+        if(cerealYield!= undefined){
+          text.push('<li>'+'Cereal Yield(kg per hectare): ' + cerealYield.toFixed(2) +'</li>');
+        }
+        if(waterAccess!= undefined){
+          text.push('<li>'+'Water Accessibility(%): ' + waterAccess.toFixed(2) +'</li>');
+        }
+
+        document.getElementById('chart-info').innerHTML = text.join("");
+
+    }
+
+
+
+
 
     /**
      * Updates the visualization's axis scales.
@@ -690,6 +773,8 @@ class GDPChart {
      */
     exportChartAsImage() {
     }
+
+
 
 
 

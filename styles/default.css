@@ -20,7 +20,16 @@ main {
 h1 {
     font-weight: 900;
     margin: 1em 0 0 0;
+    color: black;
 }
+
+li {
+    font-family: 'Roboto', sans-serif;
+    font-size: 8;
+    color:brown;
+    line-height: 200%;
+}
+
 
 #subtitle {
     font-family: 700;
@@ -52,9 +61,18 @@ h1 {
     margin: 0;
     padding: 0 1em;
     background-color: #eeeeee;
+    list-style:disc;
     width: 324px;
     height: 600px;
 }
 #year-slider {
-    width: 300px;
+    margin-top: 50px;
+}
+#year-slider, #year-slider * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
