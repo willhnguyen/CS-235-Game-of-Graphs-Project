@@ -119,15 +119,6 @@ class GDPChart {
                         y: val["CO2 Data"][this.yearToDisplay],
                         r: Math.log(this.getCountryPopulation(val["Country Code"], this.yearToDisplay))/2,
                         "Country Code": val["Country Code"]
-//                        population: this.getCountryPopulation(val["Country Code"], this.yearToDisplay),
-//                        agriculturalLand: val["Agricultural land (sq. km)"][this.yearToDisplay],
-//                        methaneEmmisions: val["Methane emissions (kt of CO2 equivalent)"][this.yearToDisplay],
-//                        otherGasEmmissions: val["Other greenhouse gas emissions (% change from 1990)"][this.yearToDisplay],
-//                        oilUsage: val["Energy use (kg of oil equivalent per capita)"][this.yearToDisplay],
-//                        powerConsumption: val["Electric power consumption (kWh per capita)"][this.yearToDisplay],
-//                        forestArea: val["Forest area (sq. km)"][this.yearToDisplay],
-//                        cerealYield: val["Cereal yield (kg per hectare)"][this.yearToDisplay],
-//                        waterAccess: val["Improved water source (% of population with access)"][this.yearToDisplay]
                     }
                  ]
              }
@@ -361,6 +352,9 @@ class GDPChart {
      * Populate the sidebar information panel with country info.
      *
      * @param {string} countryID The 3-letter id of a country
+     * @author Jisha Pillai
+     * @author Raksha Sunil (edited)
+     * @author William Nguyen (edited)
      */
     showCountryInfo(countryID) {
         // Don't need to update if the country is already shown
