@@ -63,3 +63,4 @@ typings/
 # miscellaneous
 *.zip
 *#
+.DS_Store
