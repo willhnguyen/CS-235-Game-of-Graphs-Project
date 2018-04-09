@@ -911,18 +911,18 @@ class GDPChart {
         }
         
         let chartOptions = this.chartjsObj.options.scales;
-        let axis = undefined;
+        let axisDesired = undefined;
         
         // Get the desired axis' properties
-        if (axis === "x") {
+        if (axisDesired === "x") {
             axis = chartOptions.xAxes[0];
         } else if (axis === "y") {
-            axis = chartOptions.yAxes[0];
+            axisDesired = chartOptions.yAxes[0];
         }
         
         // Update desired axis' properties
-        if (axis !== undefined) {
-            axis.type = mode;
+        if (axisDesired !== undefined) {
+            axisDesired.type = mode;
             this.updateChart();
         }
     }
