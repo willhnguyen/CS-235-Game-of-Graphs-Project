@@ -181,7 +181,7 @@ class GDPChart {
                 borderWidth: 1.2,
                 callbacks: {
                     beforeLabel : this.getChartInfo(),
-                    label: this.updateTooltipLabel
+                    label: this.updateTooltipLabel()
                 }
             },
             elements: {
@@ -505,16 +505,28 @@ class GDPChart {
      * @author  Jisha Pillai
      * @author  Raksha Sunil (editor)
      */
-    updateTooltipLabel(t, d){
-        // Show the information of identified country
-        var population = d.datasets[t.datasetIndex].data[0].population;
-        let info = [
-            d.datasets[t.datasetIndex].label, 
-            '    GDP: ' + t.xLabel.toFixed(5) + ',',
-            '    CO2: ' + t.yLabel.toFixed(5) + ',',
-            '    Population: ' + population
-        ];
-        return info;
+    updateTooltipLabel(){
+        let that = this;
+        
+        /**
+         * Closure to encapsulate this with variable that.
+         */
+        return function(t,d) {
+            // Show the information of identified country
+            let countryCode = that.chartjsObj.data.datasets[t.datasetIndex].data[0]["Country Code"];
+            let GDPVal = that.getCountryGDP(countryCode, that.yearToDisplay);
+            let CO2Val = that.getCountryCO2(countryCode, that.yearToDisplay);
+            let PopVal = that.getCountryPopulation(countryCode, that.yearToDisplay);
+            
+            let info = [
+                d.datasets[t.datasetIndex].label, 
+                '    GDP: ' + GDPVal.toFixed(5) + ',',
+                '    CO2: ' + CO2Val.toFixed(5) + ',',
+                '    Population: ' + PopVal
+            ];
+            return info;
+        }
+        
     };
 
     /**
