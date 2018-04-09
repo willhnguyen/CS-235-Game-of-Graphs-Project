@@ -1,18 +1,19 @@
 .slider {
-/*    width: calc(100% - 2 * 200px);*/
+    /*    width: calc(100% - 2 * 200px);*/
     height: 1px;
     background-color: #000;
     border-radius: 2.5px;
     position: relative;
     margin: 1em;
 }
+
 .slider-marker {
-/*    display: none;*/
+    /*    display: none;*/
     width: 10px;
     height: 15px;
     border-radius: 50%;
     background-color: #ddd;
-    border: solid 2px #888 ;
+    border: solid 2px #888;
     position: absolute;
     top: -8px;
     z-index: 1;
@@ -21,6 +22,7 @@
     cursor: -moz-grab;
     cursor: -webkit-grab;
 }
+
 .slider-tick {
     width: 1px;
     height: 8px;
@@ -28,6 +30,7 @@
     background-color: #aaa;
     top: -7px;
 }
+
 .slider-tick label {
     position: absolute;
     top: -20px;
@@ -35,12 +38,14 @@
     transform: translate(-50%, -50%) rotateZ(-90deg);
     font-size: 0.8em;
 }
+
 .slider-marker:hover,
 .slider-marker.active {
     box-shadow: 0 0 7px 0 #4FC3F7;
     background-color: #81D4FA;
     border-color: #4FC3F7;
 }
+
 .slider-marker.active {
     background-color: #03A9F4;
     border-color: #0288D1;

@@ -1,11 +1,9 @@
 /*  @author  Raksha Sunil(edited)
 */
 
-
-
 /* Importing Google's Roboto Font Family */
-@import url('https://fonts.googleapis.com/css?family=Roboto:400,700,900');
 
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,700,900');
 * {
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
@@ -31,16 +29,15 @@ h1 {
 li {
     font-family: 'Roboto', sans-serif;
     font-size: 8;
-    font-weight:bolder;
-    color:black;
+    font-weight: bolder;
+    color: black;
     line-height: 200%;
     list-style-type: none;
 }
 
 li span {
-            font-weight: normal;
-          }
-
+    font-weight: normal;
+}
 
 #subtitle {
     font-family: 700;
@@ -53,40 +50,50 @@ li span {
     background-color: #eeeeee;
     margin: auto;
 }
-#chart-container > div,section {
+
+#chart-container>div,
+section {
     display: inline-block;
     vertical-align: top;
 }
+
 #gdp-chart-container {
     height: 600px;
     width: 600px;
     margin: 0;
     padding: 0;
-/*    background-color: #e8e8e8;*/
+    /*    background-color: #e8e8e8;*/
 }
+
 #gdp-chart {
     height: 600px;
     /* background-color: red; */
 }
+
 #right-sidebar {
     margin: 0;
     padding: 1em 1em;
-/*    background-color: #fff;*/
-    list-style:disc;
+    /*    background-color: #fff;*/
+    list-style: disc;
     width: 324px;
     height: calc(100%-2em);
 }
+
 #chart-info {
     width: 100%;
 }
+
 #chart-info li,
-#chart-info p{
+#chart-info p {
     font-size: 14px;
 }
+
 #year-slider {
     margin-top: 50px;
 }
-#year-slider, #year-slider * {
+
+#year-slider,
+#year-slider * {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -94,6 +101,7 @@ li span {
     -ms-user-select: none;
     user-select: none;
 }
+
 #reset_zoom {
     width: 100%;
     margin: 0.5em;
@@ -103,16 +111,18 @@ li span {
     font-size: 1em;
     outline: none;
 }
+
 #reset_zoom:hover {
     background-color: #81D4FA;
     border-color: #4FC3F7;
 }
+
 #reset_zoom:active {
     background-color: #03A9F4;
     border-color: #0288D1;
     color: #fff;
 }
+
 #color-picker {
     width: 70%;
-    
 }

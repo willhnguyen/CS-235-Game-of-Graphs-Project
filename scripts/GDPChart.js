@@ -13,44 +13,48 @@
  * Set the desired data location and the id of the chart element to update.
  */
 let /** !String */ dataFilePath = './data/json/combined_data.json';
-//let /** !String */ dataFilePath1 = './data/json/population_data.json';
 let chartElementID = 'gdp-chart';
 let chartElement = document.getElementById(chartElementID);
+
 
 /**
  * Mouse events to detect mouse drags.
  * 
  * Needed to fix a bug in zooming where the bubbles are deselected upon mouseup.
+ * @author William Nguyen
+ * @date April 7, 2018
  */
 let mouseFlags = {
     mouseDownFlag: false,
     dragFlag: false
 }
-document.addEventListener('mousedown', function (mouseFlags) {
-    return function () {
-        mouseFlags.mouseDownFlag = true;
-        document.onmousemove = function() {
-            if (mouseFlags.mouseDownFlag)
-                mouseFlags.dragFlag = true;
-        }
-    };
-}(mouseFlags));
-document.addEventListener('mouseup', function (mouseFlags) {
-    return function (event) {
-        let mouseX = event.clientX;
-        let mouseY = event.clientY;
-        
-        let rect = chartElement.getBoundingClientRect();
-        
-        // Check if in rect
-        let inRect = (mouseY < rect.top + rect.height && mouseY > rect.top) && (mouseX < rect.left + rect.width && mouseX > rect.left);
-        if (!inRect) {
-            document.onmousemove = null;
-            mouseFlags.dragFlag = false;
-            mouseFlags.mouseDownFlag = false;
-        }
-    };
-}(mouseFlags));
+let _ = function (mouseFlags) {
+    document.addEventListener('mousedown', function (mouseFlags) {
+        return function () {
+            mouseFlags.mouseDownFlag = true;
+            document.onmousemove = function () {
+                if (mouseFlags.mouseDownFlag)
+                    mouseFlags.dragFlag = true;
+            }
+        };
+    }(mouseFlags));
+    document.addEventListener('mouseup', function (mouseFlags) {
+        return function (event) {
+            let mouseX = event.clientX;
+            let mouseY = event.clientY;
+
+            let rect = chartElement.getBoundingClientRect();
+
+            // Check if in rect
+            let inRect = (mouseY < rect.top + rect.height && mouseY > rect.top) && (mouseX < rect.left + rect.width && mouseX > rect.left);
+            if (!inRect) {
+                document.onmousemove = null;
+                mouseFlags.dragFlag = false;
+                mouseFlags.mouseDownFlag = false;
+            }
+        };
+    }(mouseFlags));
+}(mouseFlags);
 
 /**
  * The main class to fetch data and update the bubble chart visualization.
@@ -62,11 +66,12 @@ class GDPChart {
      * Initializes the chart object state variables.
      *
      * @author  William Nguyen
+     * @date March 30, 2018
      */
     constructor(chartElementID) {
-//        this.population;
+        //        this.population;
         this.data = {};
-//        this.populationData = {};
+        //        this.populationData = {};
         this.chartElement = document.getElementById(chartElementID);
         this.chartjsObj = new Chart(this.chartElement, {});
 
@@ -82,58 +87,59 @@ class GDPChart {
      * Obtain the data necessary for visualization by using a HTTP GET request.
      *
      * @author  William Nguyen
+     * @date March 30, 2018
      */
     getData() {
         // Create AJAX request object to fetch JSON data
         let httpRequest = new XMLHttpRequest();
         if (!httpRequest) {
-            alert ('There was a problem fetching the data to populate the graph.');
+            alert('There was a problem fetching the data to populate the graph.');
             return false;
         }
 
-        httpRequest.onreadystatechange = ()=>{
+        httpRequest.onreadystatechange = () => {
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
                 if (httpRequest.status === 200) {
                     // Store data for the object
                     this.data = JSON.parse(httpRequest.responseText);
                     this.generateChart();
                 } else {
-                    alert ('The request did not return success code 200.');
+                    alert('The request did not return success code 200.');
                 }
             }
         };
         httpRequest.open('GET', dataFilePath);
         httpRequest.send();
     }
-    /**
-     * Fetch population data.
-     *
-     * Obtain the data necessary for visualization by using a HTTP GET request.
-     *
-     * @author  William Nguyen
-     * @author  Jisha Pillai (editor)
-     */
-    getPopulationData() {
-        // Create AJAX request object to fetch JSON data
-        let httpRequest = new XMLHttpRequest();
-        if (!httpRequest) {
-            alert ('There was a problem fetching the data to populate the graph.');
-            return false;
-        }
+    // /**
+    //  * Fetch population data.
+    //  *
+    //  * Obtain the data necessary for visualization by using a HTTP GET request.
+    //  *
+    //  * @author  Jisha Pillai (editor)
+    //  * @date April 3, 2018
+    //  */
+    // getPopulationData() {
+    //     // Create AJAX request object to fetch JSON data
+    //     let httpRequest = new XMLHttpRequest();
+    //     if (!httpRequest) {
+    //         alert ('There was a problem fetching the data to populate the graph.');
+    //         return false;
+    //     }
 
-        httpRequest.onreadystatechange = ()=>{
-            if (httpRequest.readyState === XMLHttpRequest.DONE) {
-                if (httpRequest.status === 200) {
-                    // Store data for the object
-                    this.populationData = JSON.parse(httpRequest.responseText);
-                } else {
-                    alert ('The request did not return success code 200.');
-                }
-            }
-        };
-        httpRequest.open('GET', dataFilePath1);
-        httpRequest.send();
-    }
+    //     httpRequest.onreadystatechange = ()=>{
+    //         if (httpRequest.readyState === XMLHttpRequest.DONE) {
+    //             if (httpRequest.status === 200) {
+    //                 // Store data for the object
+    //                 this.populationData = JSON.parse(httpRequest.responseText);
+    //             } else {
+    //                 alert ('The request did not return success code 200.');
+    //             }
+    //         }
+    //     };
+    //     httpRequest.open('GET', dataFilePath1);
+    //     httpRequest.send();
+    // }
 
     /**
      * Generate chart with obtained data.
@@ -141,26 +147,27 @@ class GDPChart {
      * Creates a new chart object and provides it data to visualize. This should only be called once.
      *
      * @author  Jisha Pillai
+     * @date March 25, 2018
      * @author  William Nguyen (editor)
+     * @date March 30, 2018
      * @author  Raksha Sunil (editor)
+     * @date April 4, 2018
      */
     generateChart() {
         // Set up the dataset to be passed to chartjs
-        let chartData = this.data.data.map((val, idx, arr)=>{
+        let chartData = this.data.data.map((val, idx, arr) => {
             return {
                 label: val["Country Name"],
                 backgroundColor: this.getCountryColor(val["Country Code"], this.yearToDisplay),
                 borderColor: 'rgba(0, 0, 0, 0)',
                 borderWidth: 0,
-                data: [
-                    {
-                        x: val["GDP Data"][this.yearToDisplay],
-                        y: val["CO2 Data"][this.yearToDisplay],
-                        r: Math.log(this.getCountryPopulation(val["Country Code"], this.yearToDisplay))/2,
-                        "Country Code": val["Country Code"]
-                    }
-                 ]
-             }
+                data: [{
+                    x: val["GDP Data"][this.yearToDisplay],
+                    y: val["CO2 Data"][this.yearToDisplay],
+                    r: Math.log(this.getCountryPopulation(val["Country Code"], this.yearToDisplay)) / 2,
+                    "Country Code": val["Country Code"]
+                }]
+            }
 
         });
 
@@ -169,7 +176,7 @@ class GDPChart {
                 text: 'Climate Change Data Visualization',
                 display: 'true'
             },
-            onHover: this.onHoverEvent(this),
+            // onHover: this.onHoverEvent(this),
             onClick: this.onClickEvent(this),
             tooltips: {
                 position: 'nearest',
@@ -180,7 +187,7 @@ class GDPChart {
                 borderColor: 'rgba(0,0,0,1)',
                 borderWidth: 1.2,
                 callbacks: {
-                    beforeLabel : this.getChartInfo(),
+                    beforeLabel: this.getChartInfo(),
                     label: this.updateTooltipLabel()
                 }
             },
@@ -190,7 +197,7 @@ class GDPChart {
                     hoverBorderColor: 'rgba(125,200,220, 1)',
                     hoverBorderWidth: 3
                 }
-			},
+            },
             legend: {
                 display: false,
             },
@@ -198,46 +205,42 @@ class GDPChart {
             responsive: 'true',
             maintainAspectRatio: false,
             scales: {
-                xAxes: [
-                    {
-                        position: 'bottom',
-                        gridLines: {
-                            zeroLineColor: 'rgba(0,0,0,1)'
-                        },
-                        scaleLabel: {
-                            display: 'true',
-                            labelString: 'GDP (USD per Capita)'
-                        },
-                        ticks: {
-                            autoSkip: false,
-                            min: 50,
-                            max: 2e5,
-                            callback: this.defineLogTickLabels
-                        },
-                        afterBuildTicks: this.defineLogTicks(50, 2e5),
-                        type: 'logarithmic'
-                    }
-                ],
-                yAxes: [
-                    {
-                        position: 'left',
-                        gridLines: {
-                            zeroLineColor: 'rgba(0,0,0,1)'
-                        },
-                        scaleLabel: {
-                            display: 'true',
-                            labelString: 'CO2 Emissions (Kt)'
-                        },
-                        ticks: {
-                            autoSkip: false,
-                            min: 5,
-                            max: 2e7,
-                            callback: this.defineLogTickLabels
-                        },
-                        afterBuildTicks: this.defineLogTicks(5, 2e7),
-                        type: 'logarithmic'
-                    }
-                ]
+                xAxes: [{
+                    position: 'bottom',
+                    gridLines: {
+                        zeroLineColor: 'rgba(0,0,0,1)'
+                    },
+                    scaleLabel: {
+                        display: 'true',
+                        labelString: 'GDP (USD per Capita)'
+                    },
+                    ticks: {
+                        autoSkip: false,
+                        min: 50,
+                        max: 2e5,
+                        callback: this.defineLogTickLabels
+                    },
+                    afterBuildTicks: this.defineLogTicks(50, 2e5),
+                    type: 'logarithmic'
+                }],
+                yAxes: [{
+                    position: 'left',
+                    gridLines: {
+                        zeroLineColor: 'rgba(0,0,0,1)'
+                    },
+                    scaleLabel: {
+                        display: 'true',
+                        labelString: 'CO2 Emissions (Kt)'
+                    },
+                    ticks: {
+                        autoSkip: false,
+                        min: 5,
+                        max: 2e7,
+                        callback: this.defineLogTickLabels
+                    },
+                    afterBuildTicks: this.defineLogTicks(5, 2e7),
+                    type: 'logarithmic'
+                }]
             },
             pan: {
                 // Boolean to enable panning
@@ -247,13 +250,13 @@ class GDPChart {
                 // Eg. 'y' would only allow panning in the y direction
                 mode: 'xy',
                 limits: {
-				   xmin: 1e-4,
-				   ymin: -50,
-				   ymax: 10
-				},
-				xScale0: {
-						max: 1e4
-					}
+                    xmin: 1e-4,
+                    ymin: -50,
+                    ymax: 10
+                },
+                xScale0: {
+                    max: 1e4
+                }
             },
             // Container for zoom options
             zoom: {
@@ -265,17 +268,17 @@ class GDPChart {
                 // Eg. 'y' would only allow zooming in the y direction
                 mode: 'xy',
                 sensitivity: 10,
-				limits: {
-				  max: 10,
-				  min: 0.5
-				}
+                limits: {
+                    max: 10,
+                    min: 0.5
+                }
             }
         }
-        
-        document.onkeydown = function(evt) {
+
+        document.onkeydown = function (evt) {
             evt = evt || window.event;
             gdpChart.checkKeyInput(evt);
-          };
+        };
 
         delete this['chartjsObj'];
         this.chartjsObj = new Chart(this.chartElement, {
@@ -286,18 +289,19 @@ class GDPChart {
             options: chartOptions,
         })
     }
-    
+
     /**
      * Check for keyboard input
      *
      *ESC Key - Reloads the chart
      *
      * @author Jisha Pillai
+     * @date April 8, 2018
      */
-    checkKeyInput(event){
-        switch(event.keyCode) {
+    checkKeyInput(event) {
+        switch (event.keyCode) {
             case 27:
-//                this.chartjsObj.resetZoom();
+                //                this.chartjsObj.resetZoom();
                 this.resetZoom();
                 break;
             case 37: // Left Arrow Key
@@ -319,7 +323,7 @@ class GDPChart {
         }
     }
 
-     /**
+    /**
      * Outputs a filtered list of tick values for logarithmic scale.
      *
      * This custom function filters out unnecessary tick labels for the logarithmic scale. The
@@ -330,6 +334,7 @@ class GDPChart {
      * @param {number} index The index of the current tick in the [number] parameter named ticks
      * @param {[number]} ticks The list of tick values shown
      * @author William Nguyen
+     * @date April 4, 2018
      */
     defineLogTickLabels(tick, index, ticks) {
         // Get Most Significant digit
@@ -360,12 +365,13 @@ class GDPChart {
      * @param {number} minTick The value of the maxTick to use
      * @param {number} maxTick The value of the minTick to use
      * @author William Nguyen
+     * @date April 4, 2018
      */
     defineLogTicks(minTick, maxTick) {
-        return (scale)=>{
+        return (scale) => {
             let newTicks = [];
 
-            for (let i = minTick, scale = Math.pow(10, Math.floor(Math.log10(minTick))); i <= maxTick; ) {
+            for (let i = minTick, scale = Math.pow(10, Math.floor(Math.log10(minTick))); i <= maxTick;) {
                 if (i.toString()[0] === '5' || i.toString()[0] === '1') {
                     newTicks.push(i);
                 }
@@ -374,7 +380,7 @@ class GDPChart {
                     scale *= 10;
                 }
             }
-            if (maxTick !== newTicks[newTicks.length-1]) {
+            if (maxTick !== newTicks[newTicks.length - 1]) {
                 newTicks.push(maxTick);
             }
 
@@ -392,6 +398,7 @@ class GDPChart {
      * This method does not alter the data itself. Data changes must be made outside this function.
      *
      * @author  William Nguyen
+     * @date March 30, 2018
      */
     updateChart() {
         this.chartjsObj.update();
@@ -402,17 +409,19 @@ class GDPChart {
      *
      * @param {number} year An integer value denoting the desired year to visualize.
      * @author  William Nguyen
+     * @date March 30, 2018
      * @author  Jisha Pillai (editor)
+     * @date April 3, 2018
      */
     updateChartByYear(year) {
         // Make sure that year is an integer value, not a float.
         year = parseInt(year);
 
         // Update old data with new data
-        this.chartjsObj.data.datasets.forEach((val, idx, arr)=> {
+        this.chartjsObj.data.datasets.forEach((val, idx, arr) => {
             val.data[0].x = this.data.data[idx]["GDP Data"][year];
             val.data[0].y = this.data.data[idx]["CO2 Data"][year];
-            val.data[0].r = Math.log(this.getCountryPopulation(this.data.data[idx]["Country Code"], year))/2;
+            val.data[0].r = Math.log(this.getCountryPopulation(this.data.data[idx]["Country Code"], year)) / 2;
             val.backgroundColor = this.getCountryColor(this.data.data[idx]["Country Code"], year);
             //console.log(this.data.data[idx]["Country Code"]);
             //val.data[0].r = 10;
@@ -427,8 +436,11 @@ class GDPChart {
      *
      * @param {string} countryID The 3-letter id of a country
      * @author Jisha Pillai
+     * @date April 4, 2018
      * @author Raksha Sunil (edited)
+     * @date April 4, 2018
      * @author William Nguyen (edited)
+     * @date April 8, 2018
      */
     showCountryInfo(countryID) {
         // Don't need to update if the country is already shown
@@ -437,62 +449,60 @@ class GDPChart {
         }
         this.countryInfoShown = countryID;
         let chartInfoDiv = document.getElementById('chart-info');
-        
+
         // If there is no countryID given, then set the view to a default help text
         if (countryID === undefined) {
             // Update information to be displayed
             chartInfoDiv.innerHTML = "<p>Please select a country's bubble to the left to see relevant data.</p>";
         }
-        
+
         // Define data to display
-        const dataToDisplay = [
-            {
-                label: 'GDP',
-                key: 'GDP Data'
-            }, {
-                label: 'CO<sub>2</sub> (Kt)',
-                key: 'CO2 Data'
-            }, {
-                label: 'Population',
-                key: 'Population Data'
-            }, {
-                label: 'Agricultural land (sq. km)',
-                key: 'Agricultural land (sq. km)'
-            }, {
-                label: 'Energy use (kg of oil per capita)',
-                key: 'Energy use (kg of oil equivalent per capita)'
-            }, {
-                label: 'Forest area (sq. km)',
-                key: 'Forest area (sq. km)'
-            }, {
-                label: 'Cereal yield (kg per hectare)',
-                key: 'Cereal yield (kg per hectare)'
-            }, {
-                label: 'Water Accessibility (% of population)',
-                key: 'Improved water source (% of population with access)'
-            }
-        ];
-        
+        const dataToDisplay = [{
+            label: 'GDP',
+            key: 'GDP Data'
+        }, {
+            label: 'CO<sub>2</sub> (Kt)',
+            key: 'CO2 Data'
+        }, {
+            label: 'Population',
+            key: 'Population Data'
+        }, {
+            label: 'Agricultural land (sq. km)',
+            key: 'Agricultural land (sq. km)'
+        }, {
+            label: 'Energy use (kg of oil per capita)',
+            key: 'Energy use (kg of oil equivalent per capita)'
+        }, {
+            label: 'Forest area (sq. km)',
+            key: 'Forest area (sq. km)'
+        }, {
+            label: 'Cereal yield (kg per hectare)',
+            key: 'Cereal yield (kg per hectare)'
+        }, {
+            label: 'Water Accessibility (% of population)',
+            key: 'Improved water source (% of population with access)'
+        }];
+
         // Defined helper function to make adding new elements easier
         function addNewLi(label, info) {
             return `<li> ${label}: <span>${info.toLocaleString()}</li></span>`;
         }
-        
+
         // Generate the HTML to display
         let HTMLarray = [];
         if (this.data.data[this.data.ids[countryID]] !== undefined) {
-            HTMLarray.push('<h1>'+this.data.data[this.data.ids[countryID]]["Country Name"]+'</h1>');
+            HTMLarray.push('<h1>' + this.data.data[this.data.ids[countryID]]["Country Name"] + '</h1>');
         } else {
-            return ;
+            return;
         }
-        
+
         for (let dataInfo of dataToDisplay) {
             let foundInfo = this.getCountryInfo(countryID, this.yearToDisplay, dataInfo.key);
             if (foundInfo !== undefined) {
                 HTMLarray.push(addNewLi(dataInfo.label, foundInfo));
             }
         }
-        
+
         // Update information to be displayed
         chartInfoDiv.innerHTML = HTMLarray.join("");
     }
@@ -503,62 +513,71 @@ class GDPChart {
      * @param {object} t A single data point in the chart object's dataset
      * @param {object} d The entire dataset stored in the chart object
      * @author  Jisha Pillai
+     * @date March 25, 2018
      * @author  Raksha Sunil (editor)
+     * @date April 7, 2018
      */
-    updateTooltipLabel(){
+    updateTooltipLabel() {
         let that = this;
-        
+
         /**
          * Closure to encapsulate this with variable that.
          */
-        return function(t,d) {
+        return function (t, d) {
             // Show the information of identified country
             let countryCode = that.chartjsObj.data.datasets[t.datasetIndex].data[0]["Country Code"];
             let GDPVal = that.getCountryGDP(countryCode, that.yearToDisplay);
             let CO2Val = that.getCountryCO2(countryCode, that.yearToDisplay);
             let PopVal = that.getCountryPopulation(countryCode, that.yearToDisplay);
-            
+
             let info = [
-                d.datasets[t.datasetIndex].label, 
+                d.datasets[t.datasetIndex].label,
                 '    GDP: ' + GDPVal.toFixed(5) + ',',
                 '    CO2: ' + CO2Val.toFixed(5) + ',',
                 '    Population: ' + PopVal
             ];
             return info;
         }
-        
+
     };
 
-    /**
-     * Callback for when the chart registers a hover event.
-     */
-    onHoverEvent(context) {
-        let that = context;
+    // /**
+    //  * Callback for when the chart registers a hover event.
+    //  * 
+    //  * @author William Nguyen
+    //  * @date March 31, 2018
+    //  */
+    // onHoverEvent(context) {
+    //     let that = context;
 
-        /**
-         * Closure to provide context to GDPChart object as variable 'that'
-         * @param {Object} _ Mouse click information
-         * @param {Object} chartEl A list of objects clicked with respect to Chartjs
-         */
-        return (_, chartEl)=>{
-            if (chartEl.length > 0) {
-                // An element has been clicked.
-                let elementID = chartEl[0]._datasetIndex;
+    //     /**
+    //      * Closure to provide context to GDPChart object as variable 'that'
+    //      * @param {Object} _ Mouse click information
+    //      * @param {Object} chartEl A list of objects clicked with respect to Chartjs
+    //      */
+    //     return (_, chartEl)=>{
+    //         if (chartEl.length > 0) {
+    //             // An element has been clicked.
+    //             let elementID = chartEl[0]._datasetIndex;
 
-                // // Example of using it to extract dataset information
-                // console.log("HOVER!", chartEl);
-                // console.log(that.chartjsObj.data.datasets[elementID]);
-            } else {
-                // Chart background hovered
-                that.showCountryInfo(that.countrySelectedID);
-            }
-        }
-    }
+    //             // // Example of using it to extract dataset information
+    //             // console.log("HOVER!", chartEl);
+    //             // console.log(that.chartjsObj.data.datasets[elementID]);
+    //         } else {
+    //             // Chart background hovered
+    //             that.showCountryInfo(that.countrySelectedID);
+    //         }
+    //     }
+    // }
 
     /**
      * Callback for when the chart registers a click event.
      * 
+     * Implemented code: If a click event registers in a bubble, then update
+     * chart info box with country data.
+     * 
      * @author William Nguyen
+     * @date March 31, 2018
      */
     onClickEvent(context) {
         let that = context;
@@ -569,7 +588,7 @@ class GDPChart {
          * @param {Object} _ Mouse click information
          * @param {Object} chartEl A list of objects clicked with respect to Chartjs
          */
-        return (_, chartEl)=>{
+        return (_, chartEl) => {
             if (!(aMouseFlagsObj.dragFlag)) {
                 if (chartEl.length > 0) {
                     // An element has been clicked.
@@ -583,7 +602,7 @@ class GDPChart {
                     that.countryDeselected();
                 }
             }
-            
+
             // Reset drag flag
             aMouseFlagsObj.dragFlag = false;
             aMouseFlagsObj.mouseDownFlag = false;
@@ -598,27 +617,28 @@ class GDPChart {
      * @param {string} countryID The 3-letter id of a country
      *
      * @author William Nguyen
+     * @date April 8, 2018
      */
     countrySelected(countryID, datasetID) {
-        
-        
+
+
         // Save selection state and update information displayed in the sidebar
         this.countrySelectedID = countryID;
         this.showCountryInfo(countryID);
-        
+
         // Change bubble's stroke size
         if (datasetID !== undefined) {
             let countryID = this.chartjsObj.data.datasets[datasetID].data[0]["Country Code"];
             let bubble = this.chartjsObj.data.datasets[datasetID];
-            
+
             // Save the selected ID
             this.countrySelectedDatasetID = datasetID;
-            
+
             // Update bubble style
             // this.chartjsObj.data.datasets[datasetID].borderColor = 'rgba(0, 0, 0, 1)';
             // this.chartjsObj.data.datasets[datasetID].borderWidth = 3;
             this.chartjsObj.data.datasets[datasetID].backgroundColor = 'rgba(255, 0, 0, 0.75)';
-            
+
             // Reflect changes to chart
             this.updateChart();
         }
@@ -628,41 +648,42 @@ class GDPChart {
      * Callback for when a bubble has been deselected.
      *
      * @author William Nguyen
+     * @date April 8, 2018
      */
     countryDeselected() {
         // Reset countrySelected state and show general chart info
         this.countrySelectedID = undefined;
         this.showCountryInfo(undefined);
-        
+
         // Change bubble's stroke size
         if (this.countrySelectedDatasetID !== undefined) {
             let datasetID = this.countrySelectedDatasetID;
             let countryID = this.chartjsObj.data.datasets[datasetID].data[0]["Country Code"];
             let bubble = this.chartjsObj.data.datasets[datasetID];
-            
+
             // Reset the selected ID
             this.countrySelectedDatasetID = undefined;
-            
+
             // Update bubble style
             // bubble.borderColor = 'rgba(0, 0, 0, 0)';
             // bubble.borderWidth = 0;
             bubble.backgroundColor = this.getCountryColor(countryID, this.yearToDisplay);
-            
+
             // Reflect changes to chart
             this.updateChart();
         }
-        
+
     }
 
-//    /**
-//     * Callback for when a bubble is hovered-over
-//     *
-//     * @param {string} countryID The 3-letter id of a country
-//     */
-//    countryHovered(countryID) {
-//        // Update information displayed in the sidebar
-//        //showCountryInfo(countryID);
-//    }
+    //    /**
+    //     * Callback for when a bubble is hovered-over
+    //     *
+    //     * @param {string} countryID The 3-letter id of a country
+    //     */
+    //    countryHovered(countryID) {
+    //        // Update information displayed in the sidebar
+    //        //showCountryInfo(countryID);
+    //    }
 
     /**
      * Provides data on a particular data unit of a country.
@@ -671,6 +692,7 @@ class GDPChart {
      * @param {number} year An integer value denoting the desired year to visualize
      * @param {string} key The name of the data desired
      * @author William Nguyen
+     * @date April 8, 2018
      */
     getCountryInfo(countryID, year, key) {
         let countryIndex = this.data.ids[countryID];
@@ -679,13 +701,14 @@ class GDPChart {
         }
         return false;
     }
-    
+
     /**
      * Provides population data of a country.
      *
      * @param {string} countryID
      * @param {number} year An integer value denoting the desired year to visualize
      * @author  Jisha Pillai
+     * @date April 3, 2018
      */
     getCountryPopulation(countryID, year) {
         let countryIndex = this.data.ids[countryID];
@@ -700,6 +723,8 @@ class GDPChart {
      *
      * @param {string} countryID The 3-letter id of a country
      * @param {number} year An integer value denoting the desired year to visualize
+     * @author William Nguyen
+     * @date April 8, 2018
      */
     getCountryGDP(countryID, year) {
         return this.getCountryInfo(countryID, year, 'GDP Data');
@@ -710,6 +735,8 @@ class GDPChart {
      *
      * @param {string} countryID The 3-letter id of a country
      * @param {number} year An integer value denoting the desired year to visualize
+     * @author William Nguyen
+     * @date April 8, 2018
      */
     getCountryCO2(countryID, year) {
         return this.getCountryInfo(countryID, year, 'CO2 Data');
@@ -723,6 +750,7 @@ class GDPChart {
      *
      * @param {string} mode Name of color mode desired
      * @author William Nguyen
+     * @date April 3, 2018
      */
     changeColorMode(mode) {
         // Only change the gradient if the desired color mode is different than the one currently applied
@@ -732,7 +760,7 @@ class GDPChart {
         this.colorMode = mode;
 
         // Update graph with new colors
-        this.chartjsObj.data.datasets.forEach((val, idx, arr)=> {
+        this.chartjsObj.data.datasets.forEach((val, idx, arr) => {
             val.backgroundColor = this.getCountryColor(this.data.data[idx]["Country Code"], this.yearToDisplay);
         })
         this.updateChart()
@@ -744,15 +772,16 @@ class GDPChart {
      * @param {string} countryID The 3-letter id of a country
      * @param {number} year An integer value denoting the desired year to visualize
      * @author William Nguyen
+     * @date April 3, 2018
      */
-    getCountryColor(countryID, year, key='Forest area (sq. km)') {
+    getCountryColor(countryID, year, key = 'Forest area (sq. km)') {
         // Get a country value
         const countryIndex = this.data.ids[countryID];
         let value = false;
         if (this.data.data[countryIndex][key] !== undefined) {
             value = this.data.data[countryIndex][key][year];
         }
-        
+
         // If the country is selected, then the color is just red
         if (this.countrySelectedID === countryID) {
             return 'rgba(255, 0, 0, 1)';
@@ -767,7 +796,7 @@ class GDPChart {
             return 'rgba(85, 85, 85, 0.5)';
         }
     }
-    
+
     /**
      * Interpolate the color of a given value.
      *
@@ -777,19 +806,26 @@ class GDPChart {
      * @param {number} data_min The minimum to use to calculate the interpolation.
      * @param {number} data_max The maximum to use to calculate the interpolation.
      * @author William Nguyen
+     * @date April 3, 2018
      */
     interpolateColor(value, data_min, data_max) {
         let gradientColors = this.colorGradient;
         let gradientColorType = gradientColors[0];
         let gradient = [];
-        
+
         const gamma = 2.2; // Standard for sRGB displays
         const gamma_complement = 1 / gamma;
-        
+
         // Define a default gradient in case fallback is required
-        gradient = [[0, 85, 85, 85], [1, 85, 85, 85]];
+        gradient = [
+            [0, 85, 85, 85],
+            [1, 85, 85, 85]
+        ];
         if (gradientColorType === 'hsl') {
-            gradient = [[0, 0, 0, 50], [1, 0, 0, 50]];
+            gradient = [
+                [0, 0, 0, 50],
+                [1, 0, 0, 50]
+            ];
         }
 
         // Default color is a gray color (will stay this color if data is undefined for datapoint)
@@ -806,8 +842,8 @@ class GDPChart {
 
             // Get the colors to interpolate between
             for (let i = 2; i < gradientColors.length; ++i) {
-                if (value_percentage >= gradientColors[i-1][0] && value_percentage < gradientColors[i][0]) {
-                    gradient = [gradientColors[i-1], gradientColors[i]];
+                if (value_percentage >= gradientColors[i - 1][0] && value_percentage < gradientColors[i][0]) {
+                    gradient = [gradientColors[i - 1], gradientColors[i]];
                     break;
                 }
             }
@@ -818,24 +854,24 @@ class GDPChart {
 
             // Calculate color by interpolation
             if (gradientColors[0] === "hsl") {
-                color = color.map((_, colorId)=>{
-                    return value_percentage * gradient[1][colorId+1] + value_percentage_complement * gradient[0][colorId+1];
+                color = color.map((_, colorId) => {
+                    return value_percentage * gradient[1][colorId + 1] + value_percentage_complement * gradient[0][colorId + 1];
                 });
             } else if (gradientColors[0] === "rgb") {
                 // For RGB, values are sqrt values of actual light intensities
                 // Need to square then square-root to provide more consistent light intensity gradients
-                color = color.map((_, colorId)=>{
+                color = color.map((_, colorId) => {
                     return Math.pow(
-                        value_percentage * Math.pow(gradient[1][colorId+1], gamma) + value_percentage_complement * Math.pow(gradient[0][colorId+1], gamma),
+                        value_percentage * Math.pow(gradient[1][colorId + 1], gamma) + value_percentage_complement * Math.pow(gradient[0][colorId + 1], gamma),
                         gamma_complement
                     );
                 });
             }
 
             // Clip to proper ranges and round to int value
-            color = color.map((val)=>Math.max(val, 0));
+            color = color.map((val) => Math.max(val, 0));
             if (gradientColors[0] == "rgb") {
-                color = color.map((val)=>{
+                color = color.map((val) => {
                     return Math.min(val, 255);
                 })
             } else if (gradientColors[0] == "hsl") {
@@ -843,7 +879,7 @@ class GDPChart {
                 color[1] = Math.min(color[1], 100);
                 color[2] = Math.min(color[2], 100);
             }
-            color = color.map((val)=>Math.round(val));
+            color = color.map((val) => Math.round(val));
         }
 
 
@@ -859,18 +895,38 @@ class GDPChart {
      * Gets the color gradient for visualization;
      * 
      * @author William Nguyen
+     * @date April 3, 2018
      */
     get colorGradient() {
         // Gradients are listed as an array of colors defined as [percentage, r, g, b[, a]] where a is optional.
         const allGradients = {
-            default: ["rgb", [0, 255, 0, 0], [1, 0, 0, 255]],
-            white2red: ["rgb", [0, 255, 255, 255], [1, 255, 0, 0]],
-            white2blue: ["rgb", [0, 255, 255, 255], [1, 0, 0, 255]],
-            primaries: ["rgb", [0, 255, 0, 0], [0.5, 255, 255, 0], [1, 0, 0, 255]],
-            primariesHSL: ["hsl", [0, 0, 100, 50], [1, 240, 100, 50]],
-            ygb: ["hsl", [0, 59, 81, 69], [1, 207, 28, 19]],
-            heat: ["hsl", [0, 60, 100, 85], [0.83, 0, 100, 77], [0.83, 360, 100, 77], [1, 348, 100, 37]],
-            bw: ["rgb", [0, 0, 0, 0], [1, 255, 255, 255]]
+            default: ["rgb", [0, 255, 0, 0],
+                [1, 0, 0, 255]
+            ],
+            white2red: ["rgb", [0, 255, 255, 255],
+                [1, 255, 0, 0]
+            ],
+            white2blue: ["rgb", [0, 255, 255, 255],
+                [1, 0, 0, 255]
+            ],
+            primaries: ["rgb", [0, 255, 0, 0],
+                [0.5, 255, 255, 0],
+                [1, 0, 0, 255]
+            ],
+            primariesHSL: ["hsl", [0, 0, 100, 50],
+                [1, 240, 100, 50]
+            ],
+            ygb: ["hsl", [0, 59, 81, 69],
+                [1, 207, 28, 19]
+            ],
+            heat: ["hsl", [0, 60, 100, 85],
+                [0.83, 0, 100, 77],
+                [0.83, 360, 100, 77],
+                [1, 348, 100, 37]
+            ],
+            bw: ["rgb", [0, 0, 0, 0],
+                [1, 255, 255, 255]
+            ]
         }
 
 
@@ -888,12 +944,15 @@ class GDPChart {
      * @param {object} t A single data point in the chart object's dataset
      * @param {object} d The entire dataset stored in the chart object
      * @author  Jisha Pillai
+     * @date April 4, 2018
      * @author  Raksha Sunil (edited)
+     * @date April 7, 2018
      * @author  William Nguyen (edited) Moved majority of code into this.showCountryInfo(countryID) method
+     * @date April 8, 2018
      */
     getChartInfo() {
         let that = this;
-        
+
         // Closure to encapuslate reference to class object
         return function (t, d) {
             let pointIndex = t.datasetIndex;
@@ -903,106 +962,110 @@ class GDPChart {
         }
     }
 
-    /**
-     * Updates the visualization's axis scales.
-     *
-     * Axis scales can either be 'category', 'linear', 'logarithmic', or 'time'.
-     * Certain axis scales can better visualize a dataset or clear away
-     * visualization clutter.
-     *
-     * @param {string} axis Either "x" or "y" for the axis chosen
-     * @param {string} mode Name of the axis range type
-     * @author William Nguyen
-     */
-    axisMode(axis, mode) {
-        // Check mode
-        mode = mode.toLowerCase();
-        if (mode !== "logarithmic" && mode !== "linear")  {
-            console.log('Error: The axis modes can only either be "linear" or "logarithmic".');
-            return;
-        }
-        
-        let chartOptions = this.chartjsObj.options.scales;
-        let axisDesired = undefined;
-        
-        // Get the desired axis' properties
-        if (axisDesired === "x") {
-            axis = chartOptions.xAxes[0];
-        } else if (axis === "y") {
-            axisDesired = chartOptions.yAxes[0];
-        }
-        
-        // Update desired axis' properties
-        if (axisDesired !== undefined) {
-            axisDesired.type = mode;
-            this.updateChart();
-        }
-    }
-    
+    // /**
+    //  * Updates the visualization's axis scales.
+    //  *
+    //  * Axis scales can either be 'category', 'linear', 'logarithmic', or 'time'.
+    //  * Certain axis scales can better visualize a dataset or clear away
+    //  * visualization clutter.
+    //  *
+    //  * @param {string} axis Either "x" or "y" for the axis chosen
+    //  * @param {string} mode Name of the axis range type
+    //  * @author William Nguyen
+    //  * @date April 7, 2018
+    //  */
+    // axisMode(axis, mode) {
+    //     // Check mode
+    //     mode = mode.toLowerCase();
+    //     if (mode !== "logarithmic" && mode !== "linear")  {
+    //         console.log('Error: The axis modes can only either be "linear" or "logarithmic".');
+    //         return;
+    //     }
+
+    //     let chartOptions = this.chartjsObj.options.scales;
+    //     let axisDesired = undefined;
+
+    //     // Get the desired axis' properties
+    //     if (axisDesired === "x") {
+    //         axis = chartOptions.xAxes[0];
+    //     } else if (axis === "y") {
+    //         axisDesired = chartOptions.yAxes[0];
+    //     }
+
+    //     // Update desired axis' properties
+    //     if (axisDesired !== undefined) {
+    //         axisDesired.type = mode;
+    //         this.updateChart();
+    //     }
+    // }
+
     /**
      * If an element is selected, then allow the user to move to nearby bubbles using
      * the arrow keys.
      *
      * @param {string} mode The direction to move
      * @author William Nguyen
+     * @date April 8, 2018
      */
     getNextClosestElement(mode) {
         // If no element selected, then can't switch.
         if (this.countrySelectedID === undefined) {
             return;
         }
-        
+
         // Get the current country's info
         let currBubble = this.chartjsObj.data.datasets[this.countrySelectedDatasetID];
         let currX = Math.log(currBubble.data[0].x);
         let currY = Math.log(currBubble.data[0].y);
         let currCode = currBubble.data[0]['Country Code'];
-        
+
         // Helper functions
         function distance(x1, y1, x2, y2) {
             return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
         }
+
         function normalize(x, y) {
             let dist = distance(0, 0, x, y);
             return [x / dist, y / dist];
         }
+
         function getAngle(x1, y1, x2, y2) {
             let point = [x2 - x1, y2 - y1];
             point = normalize(point[0], point[1]);
             let angleRad = Math.atan2(point[1], point[0]);
-            
+
             return angleRad;
         }
-        
+
         // Process all points to get distance and angle from point of interest
-        let distances = this.chartjsObj.data.datasets.map((el, index)=>{
+        let distances = this.chartjsObj.data.datasets.map((el, index) => {
             let elX = Math.log(el.data[0].x);
             let elY = Math.log(el.data[0].y);
             let elCode = el.data[0]['Country Code'];
-            
+
             let dist = distance(currX, currY, elX, elY);
             let angle = getAngle(currX, currY, elX, elY) * 180 / Math.PI;
-            
+
             return {
                 dist: dist,
                 angle: angle,
                 "Country Code": elCode,
-                id: index, 
+                id: index,
                 points: [currX, currY, elX, elY],
                 orig: [el.data[0].x, el.data[0].y],
                 norm: normalize(elX - currX, elY - currY)
             }
         });
-        
+
         // Filter the points of interests by direction
-        distances = distances.filter((el, index)=>{
+        distances = distances.filter((el, index) => {
             // Ignore if the bubble represents the current country
             if (el.id === currCode) {
                 return false;
             }
-            
+
             // Filter by direction
-            if(mode === "up"){
+            if (mode === "up") {
                 return ((el.angle > 45) && (el.angle <= 135));
             } else if (mode === "down") {
                 return ((el.angle <= -45) && (el.angle > -135));
@@ -1013,12 +1076,12 @@ class GDPChart {
                 return ((el.angle <= 45) && (el.angle > -45));
             }
         });
-        
+
         // If there are no elements available, then don't do anything
         if (distances.length === 0) {
             return;
         }
-        
+
         let angleOfInterest = 0;
         if (mode === "up") {
             angleOfInterest = 90;
@@ -1029,105 +1092,83 @@ class GDPChart {
         } else if (mode === "left") {
             angleOfInterest = 180;
         }
-        
+
         // Get the shortest distance point closest to angle of interest
-        let closestPoint = distances.reduce((a, b)=>{
-//            // Determine best angle value to use
-//            let aAngle = a.angle;
-//            let bAngle = b.angle;
-//            if (mode === "left") {
-//                // Make entirely positive
-//                if (a.angle < 0) {
-//                    aAngle += 360;
-//                }
-//                if (b.angle < 0) {
-//                    bAngle += 360;
-//                }
-//            }
-//            
-//            // close-near, close-far, nonclose-near, nonclose-far
-//            let aIsCloserAngle = Math.abs(aAngle - angleOfInterest) < Math.abs(bAngle - angleOfInterest);
-//            let aIsNearer = Math.abs(a.dist) < Math.abs(b.dist);
-//            
-//            if (aIsNearer && aIsCloserAngle) {
-//                return a;
-//            } else if (aIsNearer) {
-//                return a;
-//            } else if (aIsCloserAngle) {
-//                return a;
-//            }
-//            return b;
-            
+        let closestPoint = distances.reduce((a, b) => {
+            //            // Determine best angle value to use
+            //            let aAngle = a.angle;
+            //            let bAngle = b.angle;
+            //            if (mode === "left") {
+            //                // Make entirely positive
+            //                if (a.angle < 0) {
+            //                    aAngle += 360;
+            //                }
+            //                if (b.angle < 0) {
+            //                    bAngle += 360;
+            //                }
+            //            }
+            //            
+            //            // close-near, close-far, nonclose-near, nonclose-far
+            //            let aIsCloserAngle = Math.abs(aAngle - angleOfInterest) < Math.abs(bAngle - angleOfInterest);
+            //            let aIsNearer = Math.abs(a.dist) < Math.abs(b.dist);
+            //            
+            //            if (aIsNearer && aIsCloserAngle) {
+            //                return a;
+            //            } else if (aIsNearer) {
+            //                return a;
+            //            } else if (aIsCloserAngle) {
+            //                return a;
+            //            }
+            //            return b;
+
             if (a.dist < b.dist) {
                 return a;
             }
             return b;
         });
-        
+
         // Select the shortest distance point
         this.countryDeselected();
         this.countrySelected(closestPoint["Country Code"], closestPoint.id);
     }
 
-    /**
-     * Draws chart legends to better understand data.
-     *
-     * For bubble charts, the data can be up to 4-dimensional (i.e. x-axis, y-axis,
-     * radius, and color). At the very least, radius and color legends should be
-     * displayed.
-     */
-    drawLegends() {
-    }
+    // /**
+    //  * Draws chart legends to better understand data.
+    //  *
+    //  * For bubble charts, the data can be up to 4-dimensional (i.e. x-axis, y-axis,
+    //  * radius, and color). At the very least, radius and color legends should be
+    //  * displayed.
+    //  */
+    // drawLegends() {
+    // }
 
     /**
-     * EXTRA: Filter the data to be visualized.
-     *
-     * Filter the data by some desired value. This should mainly be used for categorization.
-     * Filtering by value range can also be possible but may require additional parameters.
-     *
-     * @param {string} key The key that should be used to filter the data
-     * @param {*} filterValue The value that should be used to filter the data. Can
-     *                        be an array of values.
+     * Resets the zoom back to the original zoom values desired.
+     * 
+     * @author William Nguyen
+     * @date April 8, 2018
      */
-    filterData(key, filterValue) {
-    }
-
-    /**
-     * EXTRA: Zooms the chart based on a user's axis range selection.
-     *
-     * The user can select a range on the chart. On mouse press up, the visualization
-     * should update by zooming into the selected axes. This can also be used for
-     * mouse scroll events.
-     *
-     * @param {string} axis The axis to zoom. Either 'x' or 'y'
-     * @param {Array} range The range zoom into provided as a 2-tuple. (e.g. [0, 100])
-     */
-    zoomSelection(axis, range) {
-    }
-    
     resetZoom() {
-//        this.chartjsObj.options.scales.xAxes[0].ticks.min = 100000;
-        this.chartjsObj.options.scales.xAxes = [
-            {
-                position: 'bottom',
-                gridLines: {
-                    zeroLineColor: 'rgba(0,0,0,1)'
-                },
-                scaleLabel: {
-                    display: 'true',
-                    labelString: 'GDP (USD per Capita)'
-                },
-                ticks: {
-                    autoSkip: false,
-                    min: 50,
-                    max: 2e5,
-                    callback: this.defineLogTickLabels
-                },
-                afterBuildTicks: this.defineLogTicks(50, 2e5),
-                type: 'logarithmic'
-            }
-        ];
-        
+        //        this.chartjsObj.options.scales.xAxes[0].ticks.min = 100000;
+        this.chartjsObj.options.scales.xAxes = [{
+            position: 'bottom',
+            gridLines: {
+                zeroLineColor: 'rgba(0,0,0,1)'
+            },
+            scaleLabel: {
+                display: 'true',
+                labelString: 'GDP (USD per Capita)'
+            },
+            ticks: {
+                autoSkip: false,
+                min: 50,
+                max: 2e5,
+                callback: this.defineLogTickLabels
+            },
+            afterBuildTicks: this.defineLogTicks(50, 2e5),
+            type: 'logarithmic'
+        }];
+
         this.updateChart();
     }
 

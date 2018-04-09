@@ -6,10 +6,11 @@
  *
  * @link   http://github.com/willhnguyen/CS-235-Game-of-Graphs-Project/
  *
- * @author JP, Raksha Sunil (RS), William Nguyen (WN)
+ * @author William Nguyen (WN)
+ * @date March 31, 2018
  */
 
- /**********************************************************************
+/**********************************************************************
  * Helper Functions
  **********************************************************************/
 
@@ -18,26 +19,28 @@
  *
  * @param {Object} selectEl The DOM element for year-picker
  * @author  William Nguyen
+ * @date March 31, 2018
  */
 function yearPickerUpdated(selectEl) {
     let year = selectEl.options[selectEl.selectedIndex].value;
     gdpChart.updateChartByYear(year);
 }
 
-/**
- * Callback for when the year slider experiences an onchange event.
- *
- * @param {Object} sliderEl The DOM element for year-slider
- * @author  William Nguyen
- */
-function yearSliderUpdated(sliderEl) {
-    let year = parseInt(sliderEl.value);
+// /**
+//  * Callback for when the year slider experiences an onchange event.
+//  *
+//  * @param {Object} sliderEl The DOM element for year-slider
+//  * @author  William Nguyen
+//  * @date March 31, 2018
+//  */
+// function yearSliderUpdated(sliderEl) {
+//     let year = parseInt(sliderEl.value);
 
-    if (gdpChart.yearToDisplay !== year) {
-        gdpChart.updateChartByYear(year);
-        gdpChart.yearToDisplay = year;
-    }
-}
+//     if (gdpChart.yearToDisplay !== year) {
+//         gdpChart.updateChartByYear(year);
+//         gdpChart.yearToDisplay = year;
+//     }
+// }
 
 /**********************************************************************
  * Start Main Code
@@ -45,21 +48,21 @@ function yearSliderUpdated(sliderEl) {
 
 /**
  * The main GDPChart object used to update the visualization.
+ * 
+ * @author William Nguyen
+ * @date March 31, 2018
  */
 const gdpChart = new GDPChart('gdp-chart');
 gdpChart.getData();
-//gdpChart.getPopulationData();
+//gdpChart.getPopulationData(); // @author Jisha Pillai @date April 3, 2018
 
-//// Populate the year select dropdown list based on years available.
-//let yearPicker = document.getElementById('year-picker');
-//for (let i = 1990; i <= 2014; ++i) {
-//    yearPicker.innerHTML = yearPicker.innerHTML + "<option value='" + i.toString() + "'>" + i.toString() + "</option>";
-//}
-//
-//// Select the most recent year
-//yearPicker.selectedIndex = yearPicker.length - 1;
-
-// Create custom year slider
-let yearSlider = new Slider('year-slider', 1990, 2014, 1, [1990, 1995, 2000, 2005, 2010, 2014], function(i) {return gdpChart.updateChartByYear(i);});
-//let yearSlider = new Slider('year-slider', 1990, 2014, 1, [1990, 2000, 2010, 2014], function(i) {return gdpChart.updateChartByYear(i);});
+/**
+ * Create custom year slider.
+ * 
+ * @author William Nguyen
+ * @date April 4, 2018
+ */
+let yearSlider = new Slider('year-slider', 1990, 2014, 1, [1990, 1995, 2000, 2005, 2010, 2014], function (i) {
+    return gdpChart.updateChartByYear(i);
+});
 yearSlider.selectedVal(2014);

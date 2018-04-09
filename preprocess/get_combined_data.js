@@ -1,3 +1,9 @@
+/**
+ * Combines all the data fetched from get_data.js.
+ * 
+ * @author William Nguyen
+ * @date Mar 22, 2018
+ */
 let fs = require('fs-sync');
 
 // Read in JSON files
@@ -15,7 +21,10 @@ for (let indicator of climateList.data) {
 }
 
 // Combine Data
-let combinedData = {data: [], ids: {}};
+let combinedData = {
+    data: [],
+    ids: {}
+};
 for (let id in countriesList.data) {
     // Create a row object for each country
     // Fill it with the data
@@ -43,7 +52,7 @@ for (let id in countriesList.data) {
             rowObject['CO2 Data'][i] = parseFloat(co2Data.data[id]["CO2"][i]);
         }
         // Population Data
-        if (popData.data[id] &&i in popData.data[id]["Population"]) {
+        if (popData.data[id] && i in popData.data[id]["Population"]) {
             rowObject['Population Data'][i] = parseFloat(popData.data[id]["Population"][i]);
         }
         // Climate Change Data
