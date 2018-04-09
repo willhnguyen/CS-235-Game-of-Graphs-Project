@@ -156,7 +156,7 @@ class GDPChart {
                     {
                         x: val["GDP Data"][this.yearToDisplay],
                         y: val["CO2 Data"][this.yearToDisplay],
-                        r: Math.sqrt(this.getCountryPopulation(val["Country Code"], this.yearToDisplay))/2,
+                        r: Math.log(this.getCountryPopulation(val["Country Code"], this.yearToDisplay))/2,
                         "Country Code": val["Country Code"]
                     }
                  ]
