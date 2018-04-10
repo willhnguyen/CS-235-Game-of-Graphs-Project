@@ -453,7 +453,7 @@ class GDPChart {
         // If there is no countryID given, then set the view to a default help text
         if (countryID === undefined) {
             // Update information to be displayed
-            chartInfoDiv.innerHTML = "<p>Please select a country's bubble to the left to see relevant data.</p>";
+            chartInfoDiv.innerHTML = "<p>Please select a country's bubble to the left to see relevant data.</p><ul id='country-info-list'>";
         }
 
         // Define data to display
@@ -504,7 +504,7 @@ class GDPChart {
         }
 
         // Update information to be displayed
-        chartInfoDiv.innerHTML = HTMLarray.join("");
+        chartInfoDiv.innerHTML = HTMLarray.join("") + "</ul>";
     }
 
     /**

@@ -32,9 +32,10 @@ li {
     font-weight: bolder;
     color: black;
     line-height: 200%;
+}
+#country-info-list li {
     list-style-type: none;
 }
-
 li span {
     font-weight: normal;
 }
