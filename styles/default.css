@@ -33,6 +33,9 @@ li {
     color: black;
     line-height: 200%;
 }
+ul#country-info-list {
+    padding: 0;
+}
 #country-info-list li {
     list-style-type: none;
 }

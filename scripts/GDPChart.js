@@ -27,8 +27,9 @@ let chartElement = document.getElementById(chartElementID);
 let mouseFlags = {
     mouseDownFlag: false,
     dragFlag: false
-}
-let _ = function (mouseFlags) {
+};
+
+(function (mouseFlags) {
     document.addEventListener('mousedown', function (mouseFlags) {
         return function () {
             mouseFlags.mouseDownFlag = true;
@@ -54,7 +55,7 @@ let _ = function (mouseFlags) {
             }
         };
     }(mouseFlags));
-}(mouseFlags);
+})(mouseFlags);
 
 /**
  * The main class to fetch data and update the bubble chart visualization.
@@ -76,6 +77,7 @@ class GDPChart {
         this.chartjsObj = new Chart(this.chartElement, {});
 
         this.yearToDisplay = 2014;
+        this.countryInfoShownOfYear = 2014;
         this.countrySelectedID = undefined;
         document.getElementById('chart-info').innerHTML = "<p>Please select a country's bubble to the left to see relevant data.</p>";
         this.changeColorMode("ygb");
@@ -176,7 +178,7 @@ class GDPChart {
                 text: 'Climate Change Data Visualization',
                 display: 'true'
             },
-            // onHover: this.onHoverEvent(this),
+             onHover: this.onHoverEvent(this),
             onClick: this.onClickEvent(this),
             tooltips: {
                 position: 'nearest',
@@ -429,6 +431,7 @@ class GDPChart {
         this.yearToDisplay = year;
 
         this.updateChart();
+        this.showCountryInfo(this.countrySelectedID);
     }
 
     /**
@@ -444,16 +447,17 @@ class GDPChart {
      */
     showCountryInfo(countryID) {
         // Don't need to update if the country is already shown
-        if (countryID === this.countryInfoShown) {
+        if (countryID === this.countryInfoShown && this.countryInfoShownOfYear === this.yearToDisplay) {
             return;
         }
         this.countryInfoShown = countryID;
+        this.countryInfoShownOfYear = this.yearToDisplay;
         let chartInfoDiv = document.getElementById('chart-info');
 
         // If there is no countryID given, then set the view to a default help text
         if (countryID === undefined) {
             // Update information to be displayed
-            chartInfoDiv.innerHTML = "<p>Please select a country's bubble to the left to see relevant data.</p><ul id='country-info-list'>";
+            chartInfoDiv.innerHTML = "<p>Please select a country's bubble to the left to see relevant data.</p>";
         }
 
         // Define data to display
@@ -491,7 +495,7 @@ class GDPChart {
         // Generate the HTML to display
         let HTMLarray = [];
         if (this.data.data[this.data.ids[countryID]] !== undefined) {
-            HTMLarray.push('<h1>' + this.data.data[this.data.ids[countryID]]["Country Name"] + '</h1>');
+            HTMLarray.push('<h1>' + this.data.data[this.data.ids[countryID]]["Country Name"] + '</h1><ul id="country-info-list">');
         } else {
             return;
         }
@@ -547,28 +551,28 @@ class GDPChart {
     //  * @author William Nguyen
     //  * @date March 31, 2018
     //  */
-    // onHoverEvent(context) {
-    //     let that = context;
+    onHoverEvent(context) {
+        let that = context;
 
-    //     /**
-    //      * Closure to provide context to GDPChart object as variable 'that'
-    //      * @param {Object} _ Mouse click information
-    //      * @param {Object} chartEl A list of objects clicked with respect to Chartjs
-    //      */
-    //     return (_, chartEl)=>{
-    //         if (chartEl.length > 0) {
-    //             // An element has been clicked.
-    //             let elementID = chartEl[0]._datasetIndex;
+        /**
+         * Closure to provide context to GDPChart object as variable 'that'
+         * @param {Object} _ Mouse click information
+         * @param {Object} chartEl A list of objects clicked with respect to Chartjs
+         */
+        return (_, chartEl)=>{
+            if (chartEl.length > 0) {
+                // An element has been clicked.
+                let elementID = chartEl[0]._datasetIndex;
 
-    //             // // Example of using it to extract dataset information
-    //             // console.log("HOVER!", chartEl);
-    //             // console.log(that.chartjsObj.data.datasets[elementID]);
-    //         } else {
-    //             // Chart background hovered
-    //             that.showCountryInfo(that.countrySelectedID);
-    //         }
-    //     }
-    // }
+                // // Example of using it to extract dataset information
+                // console.log("HOVER!", chartEl);
+                // console.log(that.chartjsObj.data.datasets[elementID]);
+            } else {
+                // Chart background hovered
+                that.showCountryInfo(that.countrySelectedID);
+            }
+        }
+    }
 
     /**
      * Callback for when the chart registers a click event.
